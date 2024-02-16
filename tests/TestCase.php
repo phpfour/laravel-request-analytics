@@ -3,8 +3,8 @@
 namespace MeShaon\RequestAnalytics\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use MeShaon\RequestAnalytics\RequestAnalyticsServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {

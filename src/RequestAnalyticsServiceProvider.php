@@ -2,9 +2,9 @@
 
 namespace MeShaon\RequestAnalytics;
 
+use MeShaon\RequestAnalytics\Commands\RequestAnalyticsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use MeShaon\RequestAnalytics\Commands\RequestAnalyticsCommand;
 
 class RequestAnalyticsServiceProvider extends PackageServiceProvider
 {
