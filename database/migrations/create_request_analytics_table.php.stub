@@ -8,12 +8,26 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('laravel_request_analytics_table', function (Blueprint $table) {
+        Schema::create('request_data', function (Blueprint $table) {
             $table->id();
-
-            // add fields
-
-            $table->timestamps();
+            $table->string('url');
+            $table->string('page_title');
+            $table->string('ip_address');
+            $table->string('operating_system')->nullable();
+            $table->string('browser')->nullable();
+            $table->string('device')->nullable();
+            $table->string('screen')->nullable();
+            $table->string('referrer')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->string('language')->nullable();
+            $table->tinyText('query_params')->nullable();
+            $table->string('session_id');
+            $table->forignId('user_id')->nullable()->constranined();
+            $table->string('http_method');
+            $table->string('request_type');
+            $table->integer('response_time')->nullable()->comment('Response time in milliseconds');
+            $table->timestamp('visited_at');
         });
     }
 };
