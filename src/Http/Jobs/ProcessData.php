@@ -3,11 +3,10 @@
 namespace MeShaon\RequestAnalytics\Http\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use MeShaon\RequestAnalytics\Http\Middleware\RequestData;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class ProcessData implements ShouldQueue
 {
@@ -18,7 +17,7 @@ class ProcessData implements ShouldQueue
      */
     public function __construct(public $requestData)
     {
-      
+
     }
 
     /**
@@ -26,6 +25,6 @@ class ProcessData implements ShouldQueue
      */
     public function handle(): void
     {
-      
+
     }
 }

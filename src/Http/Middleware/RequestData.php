@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
 use Symfony\Component\HttpFoundation\Response;
 
-class RequestData 
+class RequestData
 {
     /**
      * Handle an incoming request.
@@ -39,18 +39,20 @@ class RequestData
             'language' => $request->header('Accept-Language', ''),
             'query_params' => json_encode($request->getQueryString()),
             'session_id' => session()->getId(),
-            'user_id' => Auth::id(), 
+            'user_id' => Auth::id(),
             'http_method' => $request->method(),
             'request_type' => '',
             'response_time' => '',
         ];
         ProcessData::dispatch($requestData);
     }
+
     private function extractPageTitle($content)
     {
         $matches = [];
         preg_match('/<title>(.*?)<\/title>/i', $content, $matches);
-        return isset($matches[1]) ? $matches[1] : ''; 
+
+        return isset($matches[1]) ? $matches[1] : '';
     }
 
     private function parseUserAgent($userAgent)
@@ -58,6 +60,7 @@ class RequestData
         $operating_system = $this->getOperatingSystem($userAgent);
         $browser = $this->getBrowser($userAgent);
         $device = $this->getDevice($userAgent);
+
         return compact('operating_system', 'browser', 'device');
     }
 
@@ -95,8 +98,10 @@ class RequestData
                 break;
             }
         }
+
         return $operatingSystem;
     }
+
     private function getBrowser($userAgent)
     {
         $browser = 'Unknown';
@@ -105,7 +110,7 @@ class RequestData
             '/edge/i' => 'Edge',
             '/edg/i' => 'Edge',
             '/firefox/i' => 'Firefox',
-            '/brave/i'  => 'Brave',
+            '/brave/i' => 'Brave',
             '/chrome/i' => 'Chrome',
             '/safari/i' => 'Safari',
             '/opera|opr/i' => 'Opera',
@@ -116,8 +121,10 @@ class RequestData
                 break;
             }
         }
+
         return $browser;
     }
+
     private function getDevice($userAgent)
     {
         $device = 'Unknown';
@@ -137,6 +144,7 @@ class RequestData
                 break;
             }
         }
+
         return $device;
     }
 }
