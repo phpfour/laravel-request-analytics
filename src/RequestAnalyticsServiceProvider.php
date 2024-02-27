@@ -20,6 +20,7 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_laravel-request-analytics_table')
+            ->hasMigration('create_request_analytics_table')
             ->hasCommand(RequestAnalyticsCommand::class);
     }
 }
