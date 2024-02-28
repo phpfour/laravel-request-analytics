@@ -19,6 +19,7 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
             ->name('laravel-request-analytics')
             ->hasConfigFile()
             ->hasViews()
+            ->hasRoute('web')
             ->hasMigration('create_request_analytics_table')
             ->hasCommand(RequestAnalyticsCommand::class);
     }
