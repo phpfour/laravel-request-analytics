@@ -5,14 +5,12 @@
 @php
     function getOperatingSystemImage($os): string {
         return match(strtolower($os)){
-            'windows' => 'https://img.icons8.com/color/48/000000/windows-logo.png',
-            'linux' => 'https://img.icons8.com/color/48/000000/linux.png',
-            'macos' => 'https://img.icons8.com/color/48/000000/mac-logo.png',
-            'android' => 'https://img.icons8.com/color/48/000000/android.png',
-            'ios' => 'https://img.icons8.com/color/48/000000/iphone.png',
-            'symbian' => 'https://img.icons8.com/color/48/000000/symbianos.png',
-            'webos' => 'https://img.icons8.com/color/48/000000/webos.png',
-            default => 'https://img.icons8.com/color/48/000000/unknown.png',
+            'windows' => assert('operating-systems/windows-logo.png'),
+            'linux' => assert('operating-systems/linux.png'),
+            'macos' => assert('operating-systems/mac-logo.png'),
+            'android' => assert('operating-systems/android-os.png'),
+            'ios' => assert('operating-systems/iphone.png'),
+            default => assert('operating-systems/unknown.png'),
         };
     }
 @endphp

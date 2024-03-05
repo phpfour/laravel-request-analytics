@@ -5,11 +5,11 @@
 @php
     function getBrowserImage($browser): string {
         return match(strtolower($browser)){
-            'chrome' => 'https://img.icons8.com/color/48/000000/chrome.png',
-            'firefox' => 'https://img.icons8.com/color/48/000000/firefox.png',
-            'safari' => 'https://img.icons8.com/color/48/000000/safari.png',
-            'edge' => 'https://img.icons8.com/color/48/000000/edge.png',
-            default => 'https://img.icons8.com/color/48/000000/unknown.png',
+            'chrome' =>  asset('browsers/chrome.png'),
+            'firefox' => asset('browsers/firefox.png'),
+            'safari' => asset('browsers/safari.png'),
+            'edge' => asset('browsers/microsoft-edge.png'),
+            default => asset('browsers/unknown.png'),
         };
     }
 @endphp

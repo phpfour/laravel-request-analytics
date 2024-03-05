@@ -10,16 +10,16 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        /*
-         * This class is a Package Service Provider
-         *
-         * More info: https://github.com/spatie/laravel-package-tools
-         */
+        $this->publishes([
+            __DIR__.'/../resources/assets' => public_path('/'),
+        ], 'assets');
+
         $package
             ->name('laravel-request-analytics')
             ->hasConfigFile()
             ->hasViews()
             ->hasRoute('web')
+            ->hasAssets()
             ->hasMigration('create_request_analytics_table')
             ->hasCommand(RequestAnalyticsCommand::class);
     }
