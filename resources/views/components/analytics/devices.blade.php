@@ -5,12 +5,11 @@
 @php
     function getDeviceImage($device): string {
         return match(strtolower($device)){
-            'mobile' => 'https://img.icons8.com/color/48/000000/smartphone.png',
-            'tablet' => 'https://img.icons8.com/color/48/000000/ipad.png',
-            'desktop' => 'https://img.icons8.com/color/48/000000/laptop.png',
-            'tv' => 'https://img.icons8.com/color/48/000000/tv.png',
-            'smartwatch' => 'https://img.icons8.com/color/48/000000/smart-watch.png',
-            default => 'https://img.icons8.com/color/48/000000/unknown.png',
+            'mobile' => asset('devices/smartphone.png'),
+            'tablet' => asset('devices/ipad.png'),
+            'desktop' => asset('devices/laptop.png'),
+            'tv' => asset('devices/tv.png'),
+            default => asset('devices/unknown.png'),
         };
     }
 @endphp
