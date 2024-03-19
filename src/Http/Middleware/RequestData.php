@@ -5,11 +5,10 @@ namespace MeShaon\RequestAnalytics\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDto;
-use Illuminate\Support\Facades\Auth;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Log;
-class RequestData 
+class RequestData
 {
     /**
      * Handle an incoming request.
@@ -50,6 +49,7 @@ class RequestData
         $operating_system = $this->getOperatingSystem($userAgent);
         $browser = $this->getBrowser($userAgent);
         $device = $this->getDevice($userAgent);
+
         return compact('operating_system', 'browser', 'device');
     }
 
@@ -97,7 +97,7 @@ class RequestData
             '/edge/i' => 'Edge',
             '/edg/i' => 'Edge',
             '/firefox/i' => 'Firefox',
-            '/brave/i'  => 'Brave',
+            '/brave/i' => 'Brave',
             '/chrome/i' => 'Chrome',
             '/safari/i' => 'Safari',
             '/opera|opr/i' => 'Opera',

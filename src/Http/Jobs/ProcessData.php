@@ -3,12 +3,13 @@
 namespace MeShaon\RequestAnalytics\Http\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
 
 class ProcessData implements ShouldQueue
 {
@@ -19,7 +20,7 @@ class ProcessData implements ShouldQueue
      */
     public function __construct(public RequestDataDto $requestDataDTO)
     {
-    
+
     }
 
     /**
@@ -27,6 +28,7 @@ class ProcessData implements ShouldQueue
      */
     public function handle(): void
     {
+
        try {
         $requestData = [
             'url' => $this->requestDataDTO->url,
@@ -57,5 +59,8 @@ class ProcessData implements ShouldQueue
         $matches = [];
         preg_match('/<title>(.*?)<\/title>/i', $content, $matches);
         return isset($matches[1]) ? $matches[1] : ''; 
+=======
+
+>>>>>>> 373b2b12213330f5d5b86998b13c460ac4c4f411
     }
 }
