@@ -4,10 +4,11 @@ namespace MeShaon\RequestAnalytics\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use MeShaon\RequestAnalytics\Http\DTO\RequestDataDto;
 use Illuminate\Support\Facades\Auth;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
 use Symfony\Component\HttpFoundation\Response;
-
+use Illuminate\Support\Facades\Log;
 class RequestData 
 {
     /**
@@ -22,37 +23,28 @@ class RequestData
 
     public function terminate(Request $request, Response $response): void
     {
-        $content = $response->getContent();
-        $pageTitle = $this->extractPageTitle($content);
-        $browserInfo = $this->parseUserAgent($request->header('User-Agent'));
-        $requestData = [
-            'url' => $request->url(),
-            'page_title' => $pageTitle,
-            'ip_address' => $request->ip() ?? $request->server('REMOTE_ADDR'),
-            'operating_system' => $browserInfo['operating_system'],
-            'browser' => $browserInfo['browser'],
-            'device' => $browserInfo['device'],
-            'screen' => '',
-            'referrer' => $request->header('referer', ''),
-            'country' => $request->header('CF-IPCountry', ''),
-            'city' => '',
-            'language' => $request->header('Accept-Language', ''),
-            'query_params' => json_encode($request->getQueryString()),
-            'session_id' => session()->getId(),
-            'user_id' => Auth::id(), 
-            'http_method' => $request->method(),
-            'request_type' => '',
-            'response_time' => '',
-        ];
-        ProcessData::dispatch($requestData);
+        try {
+            $url = $request->url();
+            $content = $response->getContent();
+            $browserInfo = $this->parseUserAgent($request->header('User-Agent'));
+            $ipAddress = $request->ip() ?? $request->server('REMOTE_ADDR');
+            $referrer = $request->header('referer', '');
+            $country = $request->header('CF-IPCountry', '');
+            $language = $request->header('Accept-Language', '');
+            $queryParams = json_encode($request->query());
+            $httpMethod = $request->method();
+            $responseTime = microtime(true) - LARAVEL_START;
+            $requestData = new RequestDataDto(
+                $url, $content, $browserInfo,
+                $ipAddress, $referrer, $country,
+                $language, $queryParams, $httpMethod,
+                $responseTime
+            );
+            ProcessData::dispatch($requestData);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
     }
-    private function extractPageTitle($content)
-    {
-        $matches = [];
-        preg_match('/<title>(.*?)<\/title>/i', $content, $matches);
-        return isset($matches[1]) ? $matches[1] : ''; 
-    }
-
     private function parseUserAgent($userAgent)
     {
         $operating_system = $this->getOperatingSystem($userAgent);
