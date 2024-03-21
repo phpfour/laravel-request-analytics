@@ -4,10 +4,11 @@ namespace MeShaon\RequestAnalytics\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDto;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Log;
+
 class RequestData
 {
     /**
@@ -34,9 +35,15 @@ class RequestData
             $httpMethod = $request->method();
             $responseTime = microtime(true) - LARAVEL_START;
             $requestData = new RequestDataDto(
-                $url, $content, $browserInfo,
-                $ipAddress, $referrer, $country,
-                $language, $queryParams, $httpMethod,
+                $url,
+                $content,
+                $browserInfo,
+                $ipAddress,
+                $referrer,
+                $country,
+                $language,
+                $queryParams,
+                $httpMethod,
                 $responseTime
             );
             ProcessData::dispatch($requestData);
@@ -44,6 +51,7 @@ class RequestData
             Log::error($e->getMessage());
         }
     }
+
     private function parseUserAgent($userAgent)
     {
         $operating_system = $this->getOperatingSystem($userAgent);
@@ -89,6 +97,7 @@ class RequestData
         }
         return $operatingSystem;
     }
+
     private function getBrowser($userAgent)
     {
         $browser = 'Unknown';
@@ -110,6 +119,7 @@ class RequestData
         }
         return $browser;
     }
+
     private function getDevice($userAgent)
     {
         $device = 'Unknown';
