@@ -95,6 +95,7 @@ class RequestData
                 break;
             }
         }
+
         return $operatingSystem;
     }
 
@@ -117,6 +118,7 @@ class RequestData
                 break;
             }
         }
+
         return $browser;
     }
 
@@ -139,6 +141,7 @@ class RequestData
                 break;
             }
         }
+
         return $device;
     }
 }
