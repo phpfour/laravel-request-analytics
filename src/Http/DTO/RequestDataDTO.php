@@ -2,7 +2,7 @@
 
 namespace MeShaon\RequestAnalytics\Http\DTO;
 
-class RequestDataDto
+class RequestDataDTO
 {
     public function __construct(
         public string $url,

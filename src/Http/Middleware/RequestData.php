@@ -5,7 +5,7 @@ namespace MeShaon\RequestAnalytics\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use MeShaon\RequestAnalytics\Http\DTO\RequestDataDto;
+use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,7 +14,9 @@ class RequestData
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param Request $request
+     * @param \Closure(Request): (Response) $next
+     * @return Response
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -89,6 +91,7 @@ class RequestData
             '/blackberry/i' => 'BlackBerry',
             '/webos/i' => 'Mobile',
         ];
+
         foreach ($osRegexes as $regex => $os) {
             if (preg_match($regex, $userAgent)) {
                 $operatingSystem = $os;
@@ -112,6 +115,7 @@ class RequestData
             '/safari/i' => 'Safari',
             '/opera|opr/i' => 'Opera',
         ];
+
         foreach ($browserRegexes as $regex => $br) {
             if (preg_match($regex, $userAgent)) {
                 $browser = $br;
@@ -135,6 +139,7 @@ class RequestData
             '/mobile/i' => 'Mobile',
             '/tablet/i' => 'Tablet',
         ];
+
         foreach ($deviceRegexes as $regex => $dev) {
             if (preg_match($regex, $userAgent)) {
                 $device = $dev;
