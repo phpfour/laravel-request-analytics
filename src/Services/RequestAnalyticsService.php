@@ -34,7 +34,6 @@ class RequestAnalyticsService
         return RequestAnalytics::create($requestData);
     }
 
-
     private function extractPageTitle(string $content)
     {
         $matches = [];

@@ -22,5 +22,4 @@ class ProcessData implements ShouldQueue
     {
         $requestAnalyticsService->store($this->requestDataDTO);
     }
-
 }
