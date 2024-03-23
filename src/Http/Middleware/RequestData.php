@@ -34,6 +34,7 @@ class RequestData
             $queryParams = json_encode($request->query());
             $httpMethod = $request->method();
             $responseTime = microtime(true) - LARAVEL_START;
+            $requestType = $request->ajax() ? 'api' : 'web';
             $requestData = new RequestDataDto(
                 $url,
                 $content,
@@ -44,9 +45,12 @@ class RequestData
                 $language,
                 $queryParams,
                 $httpMethod,
-                $responseTime
+                $responseTime,
+                $requestType
             );
+
             ProcessData::dispatch($requestData);
+
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }

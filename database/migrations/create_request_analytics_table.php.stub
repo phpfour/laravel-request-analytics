@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('request_data', function (Blueprint $table) {
+        Schema::create('request_analytics', function (Blueprint $table) {
             $table->id();
             $table->string('url');
             $table->string('page_title');
