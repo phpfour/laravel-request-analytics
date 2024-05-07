@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('request_analytics', function (Blueprint $table) {
             $table->id();
-            $table->string('url');
+            $table->string('path');
             $table->string('page_title');
             $table->string('ip_address');
             $table->string('operating_system')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('session_id');
             $table->foreignId('user_id')->nullable()->constrained();
             $table->string('http_method');
-            $table->string('request_type');
+            $table->string('request_category');
             $table->integer('response_time')->nullable()->comment('Response time in milliseconds');
             $table->timestamp('visited_at');
         });

@@ -11,7 +11,7 @@ class RequestAnalyticsService
     public function store(RequestDataDTO $requestDataDTO)
     {
         $requestData = [
-            'url' => $requestDataDTO->url,
+            'path' => $requestDataDTO->path,
             'page_title' => $this->extractPageTitle($requestDataDTO->content),
             'ip_address' => $requestDataDTO->ipAddress,
             'operating_system' => $requestDataDTO->browserInfo['operating_system'],
@@ -26,7 +26,7 @@ class RequestAnalyticsService
             'session_id' => session()->getId(),
             'user_id' => Auth::id(),
             'http_method' => $requestDataDTO->httpMethod,
-            'request_type' => $requestDataDTO->requestType,
+            'request_category' => $requestDataDTO->requestCategory,
             'response_time' => $requestDataDTO->responseTime,
             'visited_at' => now(),
         ];
