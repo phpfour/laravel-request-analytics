@@ -2,15 +2,13 @@
 
 namespace MeShaon\RequestAnalytics\Traits;
 
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 
 trait CaptureRequest
 {
-
-
-    public function capture(Request $request, Response $response, string $requestCategory): null|RequestDataDTO
+    public function capture(Request $request, Response $response, string $requestCategory): ?RequestDataDTO
     {
         if ($this->shouldIgnore($request->path())) {
             return null;
@@ -150,5 +148,4 @@ trait CaptureRequest
 
         return in_array($path, $ignorePaths);
     }
-
 }

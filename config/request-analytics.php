@@ -7,11 +7,11 @@ return [
     ],
 
     'capture' => [
-      'web' => true,
-      'api' => true,
+        'web' => true,
+        'api' => true,
     ],
 
     'ignore-paths' => [
 
-    ]
+    ],
 ];

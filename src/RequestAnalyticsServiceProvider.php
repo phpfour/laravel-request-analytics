@@ -17,7 +17,7 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
         ], 'assets');
 
         $this->publishes([
-            __DIR__ . '/../config/request-analytics.php' => config_path('request-analytics.php')
+            __DIR__.'/../config/request-analytics.php' => config_path('request-analytics.php'),
         ], 'config');
 
         $package
