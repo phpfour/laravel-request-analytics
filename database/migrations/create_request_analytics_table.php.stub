@@ -26,7 +26,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained();
             $table->string('http_method');
             $table->string('request_category');
-            $table->integer('response_time')->nullable()->comment('Response time in milliseconds');
+            $table->string('response_time')->nullable()->comment('Response time in milliseconds');
             $table->timestamp('visited_at');
         });
     }
