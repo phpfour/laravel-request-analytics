@@ -3,4 +3,5 @@
 use Illuminate\Support\Facades\Route;
 use MeShaon\RequestAnalytics\Controllers\RequestAnalyticsController;
 
-Route::get('/analytics', [RequestAnalyticsController::class, 'show'])->name('request.analytics');
+Route::get(config('request-analytics.route.pathname'), [RequestAnalyticsController::class, 'show'])
+    ->name(config('request-analytics.route.name'));

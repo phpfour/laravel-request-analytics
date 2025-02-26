@@ -1,58 +1,52 @@
 <?php
 
-namespace MeShaon\RequestAnalytics\Http\Middleware;
+namespace MeShaon\RequestAnalytics\Traits;
 
-use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Response;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
-use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
-use Symfony\Component\HttpFoundation\Response;
 
-class RequestData
+trait CaptureRequest
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(Request): (Response)  $next
-     */
-    public function handle(Request $request, Closure $next): Response
+    public function capture(Request $request, Response $response, string $requestCategory): ?RequestDataDTO
     {
-        return $next($request);
-    }
-
-    public function terminate(Request $request, Response $response): void
-    {
-        try {
-            $url = $request->url();
-            $content = $response->getContent();
-            $browserInfo = $this->parseUserAgent($request->header('User-Agent'));
-            $ipAddress = $request->ip() ?? $request->server('REMOTE_ADDR');
-            $referrer = $request->header('referer', '');
-            $country = $request->header('CF-IPCountry', '');
-            $language = $request->header('Accept-Language', '');
-            $queryParams = json_encode($request->query());
-            $httpMethod = $request->method();
-            $responseTime = microtime(true) - LARAVEL_START;
-            $requestData = new RequestDataDto(
-                $url,
-                $content,
-                $browserInfo,
-                $ipAddress,
-                $referrer,
-                $country,
-                $language,
-                $queryParams,
-                $httpMethod,
-                $responseTime
-            );
-            ProcessData::dispatch($requestData);
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
+        if ($this->shouldIgnore($request->path())) {
+            return null;
         }
+
+        return $this->prepareRequestData($request, $response, $requestCategory);
     }
 
-    private function parseUserAgent($userAgent)
+    protected function prepareRequestData(Request $request, Response $response, string $requestCategory): RequestDataDTO
+    {
+        $path = $request->path();
+        $content = $response->getContent();
+        $browserInfo = $this->parseUserAgent($request->header('User-Agent'));
+        $ipAddress = $request->ip() ?? $request->server('REMOTE_ADDR');
+        $referrer = $request->header('referer', '');
+        $country = $request->header('CF-IPCountry', '');
+        $language = $request->header('Accept-Language', '');
+        $queryParams = json_encode($request->query());
+        $httpMethod = $request->method();
+        $responseTime = microtime(true) - LARAVEL_START;
+
+        return new RequestDataDto(
+            $path,
+            $content,
+            $browserInfo,
+            $ipAddress,
+            $referrer,
+            $country,
+            $language,
+            $queryParams,
+            $httpMethod,
+            $responseTime,
+            $requestCategory
+        );
+
+    }
+
+    protected function parseUserAgent($userAgent)
     {
         $operating_system = $this->getOperatingSystem($userAgent);
         $browser = $this->getBrowser($userAgent);
@@ -61,7 +55,7 @@ class RequestData
         return compact('operating_system', 'browser', 'device');
     }
 
-    private function getOperatingSystem($userAgent)
+    protected function getOperatingSystem($userAgent)
     {
         $operatingSystem = 'Unknown';
         $osRegexes = [
@@ -100,7 +94,7 @@ class RequestData
         return $operatingSystem;
     }
 
-    private function getBrowser($userAgent)
+    protected function getBrowser($userAgent)
     {
         $browser = 'Unknown';
         $browserRegexes = [
@@ -124,7 +118,7 @@ class RequestData
         return $browser;
     }
 
-    private function getDevice($userAgent)
+    protected function getDevice($userAgent)
     {
         $device = 'Unknown';
         $deviceRegexes = [
@@ -146,5 +140,12 @@ class RequestData
         }
 
         return $device;
+    }
+
+    protected function shouldIgnore(string $path): bool
+    {
+        $ignorePaths = array_merge(config('request-analytics.ignore-paths'), [config('request-analytics.route.pathname')]);
+
+        return in_array($path, $ignorePaths);
     }
 }
