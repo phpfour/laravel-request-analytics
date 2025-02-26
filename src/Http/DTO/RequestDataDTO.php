@@ -16,6 +16,5 @@ class RequestDataDTO
         public string $httpMethod,
         public int $responseTime,
         public string $requestCategory
-    ) {
-    }
+    ) {}
 }
