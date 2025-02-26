@@ -21,15 +21,11 @@ class APIRequestCapture
     public function terminate(Request $request, Response $response): void
     {
         try {
-
             if ($requestData = $this->capture($request, $response, 'api')) {
                 ProcessData::dispatch($requestData);
             }
-
         } catch (\Exception $e) {
-
             Log::error($e->getMessage());
-
         }
     }
 }
