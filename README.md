@@ -28,7 +28,7 @@ php artisan migrate
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-request-analytics-config"
+php artisan vendor:publish --tag="request-analytics-config"
 ```
 
 This is the contents of the published config file:
@@ -37,11 +37,15 @@ This is the contents of the published config file:
 return [
 ];
 ```
+You can publish the assets with this command:
+```bash
+php artisan vendor:publish --tag="request-analytics-assets"
+```
 
 Optionally, you can publish the views using
 
 ```bash
-php artisan vendor:publish --tag="laravel-request-analytics-views"
+php artisan vendor:publish --tag="request-analytics-views"
 ```
 
 ## Usage
