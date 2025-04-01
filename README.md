@@ -35,6 +35,23 @@ This is the contents of the published config file:
 
 ```php
 return [
+    'route' => [
+        'name' => 'request.analytics',
+        'pathname' => env('REQUEST_ANALYTICS_PATHNAME', 'analytics'),
+    ],
+
+    'capture' => [
+        'web' => true,
+        'api' => true,
+    ],
+
+    'queue' => [
+        'enabled' => env('REQUEST_ANALYTICS_QUEUE_ENABLED', true),
+    ],
+
+    'ignore-paths' => [
+
+    ],
 ];
 ```
 You can publish the assets with this command:
