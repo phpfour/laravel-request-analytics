@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
-use MeShaon\RequestAnalytics\Services\RequestAnalyticsService;
 use MeShaon\RequestAnalytics\Traits\CaptureRequest;
 
 class WebRequestCapture
