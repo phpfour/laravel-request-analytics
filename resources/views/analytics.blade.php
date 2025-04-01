@@ -8,7 +8,15 @@
                 <x-request-analytics::stats.count label="Average Visit Time" :value='$average["average-visit-time"]'/>
             </div>
             <div class="flex items-center flex-wrap gap-4">
-                <x-request-analytics::core.button color="secondary">Filter</x-request-analytics::core.button>
+                <form method="GET" action="{{ route(config('request-analytics.route.name')) }}" class="flex items-center gap-2">
+                    <select name="date_range" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="7" {{ $dateRange == 7 ? 'selected' : '' }}>Last 7 days</option>
+                        <option value="30" {{ $dateRange == 30 ? 'selected' : '' }}>Last 30 days</option>
+                        <option value="90" {{ $dateRange == 90 ? 'selected' : '' }}>Last 90 days</option>
+                        <option value="365" {{ $dateRange == 365 ? 'selected' : '' }}>Last year</option>
+                    </select>
+                    <x-request-analytics::core.button type="submit" color="primary">Apply Filter</x-request-analytics::core.button>
+                </form>
             </div>
         </div>
 
