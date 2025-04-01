@@ -2,11 +2,11 @@
 
 namespace MeShaon\RequestAnalytics\Controllers;
 
+use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Carbon\CarbonInterval;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
 
 class RequestAnalyticsController extends BaseController
@@ -39,6 +39,7 @@ class RequestAnalyticsController extends BaseController
     private function getBaseQuery()
     {
         $startDate = Carbon::now()->subDays($this->dateRange)->startOfDay();
+
         return RequestAnalytics::where('visited_at', '>=', $startDate);
     }
 
@@ -61,6 +62,7 @@ class RequestAnalyticsController extends BaseController
 
         return $countries->map(function ($country) use ($totalVisitors) {
             $percentage = round(($country->visitorCount / $totalVisitors) * 100, 1);
+
             return [
                 'name' => $country->name,
                 'visitorCount' => $country->visitorCount,
@@ -88,6 +90,7 @@ class RequestAnalyticsController extends BaseController
 
         return $browsers->map(function ($browser) use ($totalVisitors) {
             $percentage = round(($browser->visitorCount / $totalVisitors) * 100, 1);
+
             return [
                 'browser' => $browser->browser,
                 'visitorCount' => $browser->visitorCount,
@@ -114,6 +117,7 @@ class RequestAnalyticsController extends BaseController
 
         return $operatingSystems->map(function ($os) use ($totalVisitors) {
             $percentage = round(($os->visitorCount / $totalVisitors) * 100, 1);
+
             return [
                 'name' => $os->name,
                 'visitorCount' => $os->visitorCount,
@@ -140,6 +144,7 @@ class RequestAnalyticsController extends BaseController
 
         return $devices->map(function ($device) use ($totalVisitors) {
             $percentage = round(($device->visitorCount / $totalVisitors) * 100, 1);
+
             return [
                 'name' => $device->name,
                 'visitorCount' => $device->visitorCount,
@@ -165,6 +170,7 @@ class RequestAnalyticsController extends BaseController
 
         return $pages->map(function ($page) use ($totalPageViews) {
             $percentage = round(($page->visitorCount / $totalPageViews) * 100, 1);
+
             return [
                 'path' => $page->path,
                 'visitorCount' => $page->visitorCount,
@@ -195,6 +201,7 @@ class RequestAnalyticsController extends BaseController
 
         return $referrers->map(function ($referrer) use ($totalVisitors) {
             $percentage = round(($referrer->visitorCount / $totalVisitors) * 100, 1);
+
             return [
                 'domain' => $referrer->domain ?: '(direct)',
                 'visitorCount' => $referrer->visitorCount,
@@ -208,19 +215,18 @@ class RequestAnalyticsController extends BaseController
         $days = $this->dateRange;
         $startDate = Carbon::now()->subDays($days)->startOfDay();
 
-
         $dateRange = collect(range(0, $days))
             ->mapWithKeys(function ($day) {
                 $date = Carbon::now()->subDays($day)->format('Y-m-d');
+
                 return [
                     $date => [
                         'date' => $date,
                         'views' => 0,
-                        'visitors' => 0
-                    ]
+                        'visitors' => 0,
+                    ],
                 ];
             });
-
 
         $dailyData = $this->getBaseQuery()
             ->select(
@@ -239,7 +245,6 @@ class RequestAnalyticsController extends BaseController
                 ? array_merge($item, $dailyData->get($date)->toArray())
                 : $item;
         })->sortKeys();
-
 
         $datasets = [
             [
@@ -308,7 +313,7 @@ class RequestAnalyticsController extends BaseController
         return [
             'views' => $totalViews,
             'visitors' => $uniqueVisitors,
-            'bounce-rate' => $bounceRate . '%',
+            'bounce-rate' => $bounceRate.'%',
             'average-visit-time' => $this->formatTimeWithCarbon($avgVisitTime),
         ];
     }
@@ -316,7 +321,7 @@ class RequestAnalyticsController extends BaseController
     /**
      * Format seconds into a human-readable duration using Carbon
      *
-     * @param int $seconds
+     * @param  int  $seconds
      * @return string
      */
     private function formatTimeWithCarbon($seconds)
