@@ -27,7 +27,11 @@ class WebRequestCapture
     {
         try {
             if ($requestData = $this->capture($request, $response, 'web')) {
-                ProcessData::dispatch($requestData);
+                if (config('request-analytics.queue.enabled', true)) {
+                    ProcessData::dispatch($requestData);
+                } else {
+                    ProcessData::dispatchSync($requestData);
+                }
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());

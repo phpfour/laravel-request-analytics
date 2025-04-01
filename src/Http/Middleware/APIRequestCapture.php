@@ -22,7 +22,11 @@ class APIRequestCapture
     {
         try {
             if ($requestData = $this->capture($request, $response, 'api')) {
-                ProcessData::dispatch($requestData);
+                if (config('request-analytics.queue.enabled', true)) {
+                    ProcessData::dispatch($requestData);
+                } else {
+                    ProcessData::dispatchSync($requestData);
+                }
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
