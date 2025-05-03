@@ -21,7 +21,7 @@ composer require me-shaon/laravel-request-analytics
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-request-analytics-migrations"
+php artisan vendor:publish --tag="request-analytics-migrations"
 php artisan migrate
 ```
 
