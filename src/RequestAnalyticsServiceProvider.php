@@ -3,6 +3,7 @@
 namespace MeShaon\RequestAnalytics;
 
 use MeShaon\RequestAnalytics\Commands\RequestAnalyticsCommand;
+use MeShaon\RequestAnalytics\Http\Middleware\AnalyticsDashboardMiddleware;
 use MeShaon\RequestAnalytics\Http\Middleware\APIRequestCapture;
 use MeShaon\RequestAnalytics\Http\Middleware\WebRequestCapture;
 use Spatie\LaravelPackageTools\Package;
@@ -46,6 +47,7 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
 
         $router->aliasMiddleware('request-analytics.web', WebRequestCapture::class);
         $router->aliasMiddleware('request-analytics.api', APIRequestCapture::class);
+        $router->aliasMiddleware('request-analytics.access', AnalyticsDashboardMiddleware::class);
     }
 
     private function pushMiddlewareToPipeline()
