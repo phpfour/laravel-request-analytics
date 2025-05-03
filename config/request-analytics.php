@@ -16,6 +16,6 @@ return [
     ],
 
     'ignore-paths' => [
-
+        env('REQUEST_ANALYTICS_PATHNAME', 'analytics'),
     ],
 ];
