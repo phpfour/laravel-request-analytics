@@ -24,7 +24,7 @@ class RequestAnalytics extends Model
     public function prunable(): Builder
     {
         if (! config('request-analytics.pruning.enabled', false)) {
-            return static::query();
+            return $this->whereRaw('1 = 0');
         }
 
         $days = config('request-analytics.pruning.days', 90);

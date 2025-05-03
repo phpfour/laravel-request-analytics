@@ -61,20 +61,42 @@ return [
 ```
 ### Data Purning 
 You can delete your data from your database automatically.
+
+If you are using Laravel 11+ then you may use `model:prune` command.
 Add this to your `routes/console.php`
 
 ```php
 use Illuminate\Support\Facades\Schedule;
  
-Schedule::command('model:prune')->everyMinute();
-```
-Or If you are using Laravel 11+ then you may use this also into your `bootstarp/app.php`
+Schedule::command('model:prune')->daily();
+``` 
+Or try this `bootstarp/app.php`
 ```php
 use Illuminate\Console\Scheduling\Schedule;
 ->withSchedule(function (Schedule $schedule) {
-     $schedule->command('model:prune')->everyMinute();
+     $schedule->command('model:prune')->daily();
     })
 ```
+
+If you are using Laravel 10 or below then you may use `model:prune` command.
+You may define all of your scheduled tasks in the schedule method of your application's `App\Console\Kernel` class
+```php
+<?php
+
+namespace App\Console;
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+class Kernel extends ConsoleKernel
+{
+    protected function schedule(Schedule $schedule): void
+    {
+        $schedule->command('model:prune')->daily();
+    }
+}
+```
+
 You can publish the assets with this command:
 ```bash
 php artisan vendor:publish --tag="request-analytics-assets"
