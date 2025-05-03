@@ -13,4 +13,3 @@ Route::middleware(['api', 'auth:sanctum', 'request-analytics.access'])
             'data' => 'Coming soon...',
         ]);
     })->name(config('request-analytics.route.name').'.api');
-

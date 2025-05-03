@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
+
 namespace MeShaon\RequestAnalytics\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use MeShaon\RequestAnalytics\Contracts\CanAccessAnalyticsDashboard;
 
 class AnalyticsDashboardMiddleware
@@ -13,13 +14,13 @@ class AnalyticsDashboardMiddleware
     {
         $user = $request->user();
 
-        if (!$user || !($user instanceof CanAccessAnalyticsDashboard)) {
+        if (! $user || ! ($user instanceof CanAccessAnalyticsDashboard)) {
             return $request->expectsJson()
                 ? response()->json(['message' => 'Unauthorized'], 403)
                 : abort(403);
         }
 
-        if (!$user->canAccessAnalyticsDashboard()) {
+        if (! $user->canAccessAnalyticsDashboard()) {
             return $request->expectsJson()
                 ? response()->json(['message' => 'Access denied'], 403)
                 : abort(403);
@@ -27,5 +28,4 @@ class AnalyticsDashboardMiddleware
 
         return $next($request);
     }
-
 }
