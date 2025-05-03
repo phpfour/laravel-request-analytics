@@ -34,9 +34,8 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
 
     public function boot()
     {
+        parent::boot();
         $this->pushMiddlewareToPipeline();
-
-        return parent::boot();
     }
 
     private function registerMiddlewareAsAliases()
@@ -50,15 +49,14 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
 
     private function pushMiddlewareToPipeline()
     {
-        /* @var \Illuminate\Routing\Router */
-        $router = $this->app->make('router');
-
         if (config('request-analytics.capture.web')) {
-            $router->pushMiddlewareToGroup('web', WebRequestCapture::class);
+            $this->app[\Illuminate\Contracts\Http\Kernel::class]->appendMiddlewareToGroup('web',
+                WebRequestCapture::class);
         }
 
         if (config('request-analytics.capture.api')) {
-            $router->pushMiddlewareToGroup('api', APIRequestCapture::class);
+            $this->app[\Illuminate\Contracts\Http\Kernel::class]->appendMiddlewareToGroup('api',
+                APIRequestCapture::class);
         }
     }
 }
