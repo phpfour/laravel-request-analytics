@@ -29,6 +29,6 @@ class RequestAnalytics extends Model
 
         $days = config('request-analytics.pruning.days', 90);
 
-        return static::where('visited_at', '<', Carbon::now()->subDays($days));
+        return static::where('visited_at', '<=', Carbon::now()->subDays($days));
     }
 }

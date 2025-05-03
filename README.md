@@ -68,13 +68,17 @@ Add this to your `routes/console.php`
 ```php
 use Illuminate\Support\Facades\Schedule;
  
-Schedule::command('model:prune')->daily();
+Schedule::command('model:prune', [
+            '--model' => 'MeShaon\RequestAnalytics\Models\RequestAnalytics',
+        ])->daily();
 ``` 
 Or try this `bootstarp/app.php`
 ```php
 use Illuminate\Console\Scheduling\Schedule;
 ->withSchedule(function (Schedule $schedule) {
-     $schedule->command('model:prune')->daily();
+     $schedule->command('model:prune', [
+            '--model' => 'MeShaon\RequestAnalytics\Models\RequestAnalytics',
+        ])->daily();
     })
 ```
 
@@ -92,7 +96,9 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('model:prune')->daily();
+        $schedule->command('model:prune', [
+            '--model' => 'MeShaon\RequestAnalytics\Models\RequestAnalytics',
+        ])->daily();
     }
 }
 ```
