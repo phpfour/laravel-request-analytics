@@ -23,6 +23,10 @@ class RequestAnalytics extends Model
      */
     public function prunable(): Builder
     {
+        if (! config('request-analytics.pruning.enabled', false)) {
+            return static::query();
+        }
+
         $days = config('request-analytics.pruning.days', 90);
 
         return static::where('visited_at', '<', Carbon::now()->subDays($days));
