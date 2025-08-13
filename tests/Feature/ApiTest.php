@@ -12,7 +12,7 @@ beforeEach(function () {
 
 it('returns analytics overview', function () {
     $response = $this->getJson('/api/v1/analytics/overview');
-    
+
     $response->assertStatus(200)
         ->assertJsonStructure([
             'success',
@@ -36,7 +36,7 @@ it('returns analytics overview', function () {
 
 it('returns paginated visitors', function () {
     $response = $this->getJson('/api/v1/analytics/visitors?per_page=10');
-    
+
     $response->assertStatus(200)
         ->assertJsonStructure([
             'success',
@@ -51,11 +51,11 @@ it('returns paginated visitors', function () {
 
 it('filters page views by path', function () {
     RequestAnalytics::factory()->create(['path' => '/test-page']);
-    
+
     $response = $this->getJson('/api/v1/analytics/page-views?path=test-page');
-    
+
     $response->assertStatus(200);
-    
+
     $data = $response->json('data.data');
     foreach ($data as $item) {
         expect($item['path'])->toContain('test-page');
@@ -64,7 +64,7 @@ it('filters page views by path', function () {
 
 it('validates date range parameters', function () {
     $response = $this->getJson('/api/v1/analytics/overview?date_range=400');
-    
+
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['date_range']);
 });
@@ -75,7 +75,7 @@ it('queues export job', function () {
         'type' => 'overview',
         'date_range' => 30,
     ]);
-    
+
     $response->assertStatus(200)
         ->assertJsonStructure([
             'success',

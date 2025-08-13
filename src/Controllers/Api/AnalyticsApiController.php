@@ -21,10 +21,10 @@ class AnalyticsApiController extends BaseController
         ]);
 
         $dateRange = $this->getDateRange($request);
-        
+
         $data = Cache::remember("api_overview_{$dateRange['key']}", now()->addMinutes(5), function () use ($dateRange) {
             $query = $this->getBaseQuery($dateRange);
-            
+
             return [
                 'summary' => $this->getSummary($query),
                 'chart' => $this->getChartData($query, $dateRange),
@@ -53,7 +53,7 @@ class AnalyticsApiController extends BaseController
 
         $dateRange = $this->getDateRange($request);
         $perPage = $request->input('per_page', 50);
-        
+
         $visitors = $this->getBaseQuery($dateRange)
             ->select(
                 'visitor_id',
@@ -85,13 +85,13 @@ class AnalyticsApiController extends BaseController
 
         $dateRange = $this->getDateRange($request);
         $perPage = $request->input('per_page', 50);
-        
+
         $query = $this->getBaseQuery($dateRange);
-        
+
         if ($path = $request->input('path')) {
             $query->where('path', 'like', "%{$path}%");
         }
-        
+
         $pageViews = $query
             ->select('*')
             ->orderBy('visited_at', 'desc')
@@ -136,7 +136,7 @@ class AnalyticsApiController extends BaseController
             'start' => $startDate,
             'end' => $endDate,
             'days' => $days,
-            'key' => $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d'),
+            'key' => $startDate->format('Y-m-d').'_'.$endDate->format('Y-m-d'),
         ];
     }
 
@@ -181,7 +181,7 @@ class AnalyticsApiController extends BaseController
         while ($current <= $dateRange['end']) {
             $dateStr = $current->format('Y-m-d');
             $labels[] = $current->format('M d');
-            
+
             if ($data->has($dateStr)) {
                 $views[] = $data->get($dateStr)->views;
                 $visitors[] = $data->get($dateStr)->visitors;
@@ -189,7 +189,7 @@ class AnalyticsApiController extends BaseController
                 $views[] = 0;
                 $visitors[] = 0;
             }
-            
+
             $current->addDay();
         }
 

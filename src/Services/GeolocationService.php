@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 class GeolocationService
 {
     protected string $provider;
+
     protected ?string $apiKey;
+
     protected int $cacheMinutes = 1440; // 24 hours
 
     public function __construct()
@@ -79,12 +81,12 @@ class GeolocationService
 
     protected function lookupWithIpGeolocation(string $ip): array
     {
-        if (!$this->apiKey) {
+        if (! $this->apiKey) {
             return $this->getDefaultLocation();
         }
 
         try {
-            $response = Http::timeout(5)->get("https://api.ipgeolocation.io/ipgeo", [
+            $response = Http::timeout(5)->get('https://api.ipgeolocation.io/ipgeo', [
                 'apiKey' => $this->apiKey,
                 'ip' => $ip,
                 'fields' => 'country_name,country_code2,state_prov,city,latitude,longitude,time_zone,isp',
@@ -92,6 +94,7 @@ class GeolocationService
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return [
                     'country' => $data['country_name'] ?? '',
                     'country_code' => $data['country_code2'] ?? '',
@@ -119,13 +122,13 @@ class GeolocationService
         // This would require the GeoIP2 PHP library
         // composer require geoip2/geoip2
         // Implementation would depend on whether using web service or local database
-        
+
         return $this->getDefaultLocation();
     }
 
     protected function isLocalIp(string $ip): bool
     {
-        return in_array($ip, ['127.0.0.1', '::1']) || 
+        return in_array($ip, ['127.0.0.1', '::1']) ||
                str_starts_with($ip, '192.168.') ||
                str_starts_with($ip, '10.') ||
                str_starts_with($ip, '172.');

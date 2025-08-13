@@ -20,7 +20,7 @@ class BotDetectionService
         'python-requests', 'python-urllib', 'go-http-client',
         'java/', 'apache-httpclient', 'okhttp', 'postman',
         'insomnia', 'paw/', 'rest-client', 'ruby/', 'perl/',
-        'php/', 'node-fetch', 'axios/', 'got/', 'superagent'
+        'php/', 'node-fetch', 'axios/', 'got/', 'superagent',
     ];
 
     protected array $botIpRanges = [
@@ -64,9 +64,9 @@ class BotDetectionService
         }
 
         // Check for missing browser indicators
-        if (!str_contains($userAgentLower, 'mozilla') && 
-            !str_contains($userAgentLower, 'opera') && 
-            !str_contains($userAgentLower, 'webkit')) {
+        if (! str_contains($userAgentLower, 'mozilla') &&
+            ! str_contains($userAgentLower, 'opera') &&
+            ! str_contains($userAgentLower, 'webkit')) {
             return true;
         }
 
@@ -80,6 +80,7 @@ class BotDetectionService
                 return true;
             }
         }
+
         return false;
     }
 
@@ -89,12 +90,12 @@ class BotDetectionService
             return $ip === $range;
         }
 
-        list($subnet, $bits) = explode('/', $range);
+        [$subnet, $bits] = explode('/', $range);
         $ip = ip2long($ip);
         $subnet = ip2long($subnet);
         $mask = -1 << (32 - $bits);
         $subnet &= $mask;
-        
+
         return ($ip & $mask) == $subnet;
     }
 
@@ -105,7 +106,7 @@ class BotDetectionService
         }
 
         $userAgentLower = strtolower($userAgent);
-        
+
         $botNames = [
             'googlebot' => 'Google',
             'bingbot' => 'Bing',

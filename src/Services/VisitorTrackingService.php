@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class VisitorTrackingService
 {
     protected string $cookieName = 'ra_visitor_id';
+
     protected int $cookieLifetime = 525600; // 1 year in minutes
 
     public function getVisitorId(Request $request): string
@@ -20,10 +21,10 @@ class VisitorTrackingService
 
         // Generate new visitor ID
         $visitorId = $this->generateVisitorId($request);
-        
+
         // Set cookie for future requests
         Cookie::queue($this->cookieName, $visitorId, $this->cookieLifetime);
-        
+
         return $visitorId;
     }
 
@@ -31,9 +32,9 @@ class VisitorTrackingService
     {
         // Create a fingerprint based on various factors
         $fingerprint = $this->createFingerprint($request);
-        
+
         // Generate a unique ID combining fingerprint and random string
-        return hash('sha256', $fingerprint . Str::random(32));
+        return hash('sha256', $fingerprint.Str::random(32));
     }
 
     protected function createFingerprint(Request $request): string
@@ -65,13 +66,13 @@ class VisitorTrackingService
         // Create a session ID based on visitor ID and timestamp
         $visitorId = $this->getVisitorId($request);
         $timestamp = floor(time() / 1800); // 30-minute sessions
-        
-        return hash('sha256', $visitorId . '|' . $timestamp);
+
+        return hash('sha256', $visitorId.'|'.$timestamp);
     }
 
     public function isNewVisitor(Request $request): bool
     {
-        return !$request->hasCookie($this->cookieName);
+        return ! $request->hasCookie($this->cookieName);
     }
 
     public function isReturningVisitor(Request $request): bool

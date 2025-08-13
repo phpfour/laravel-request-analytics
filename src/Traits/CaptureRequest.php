@@ -23,7 +23,7 @@ trait CaptureRequest
         }
 
         // Skip bot traffic unless explicitly enabled
-        if ($this->isBot($request) && !config('request-analytics.capture.bots', false)) {
+        if ($this->isBot($request) && ! config('request-analytics.capture.bots', false)) {
             return null;
         }
 
@@ -37,26 +37,26 @@ trait CaptureRequest
         $browserInfo = $this->parseUserAgent($request->header('User-Agent'));
         $ipAddress = $this->getIpAddress($request);
         $referrer = $request->header('referer', '');
-        
+
         // Get country from geolocation or CloudFlare header
         $country = '';
         $city = '';
         if (config('request-analytics.geolocation.enabled')) {
-            $geo = new GeolocationService();
+            $geo = new GeolocationService;
             $location = $geo->lookup($ipAddress);
             $country = $location['country'] ?: $request->header('CF-IPCountry', '');
             $city = $location['city'] ?? '';
         } else {
             $country = $request->header('CF-IPCountry', '');
         }
-        
+
         $language = $request->header('Accept-Language', '');
         $queryParams = json_encode($request->query());
         $httpMethod = $request->method();
         $responseTime = microtime(true) - LARAVEL_START;
-        
+
         // Get visitor and session IDs
-        $visitorTracking = new VisitorTrackingService();
+        $visitorTracking = new VisitorTrackingService;
         $visitorId = $visitorTracking->getVisitorId($request);
         $sessionId = $visitorTracking->getSessionId($request);
 
@@ -81,12 +81,12 @@ trait CaptureRequest
     protected function getIpAddress(Request $request): string
     {
         $ip = $request->ip() ?? $request->server('REMOTE_ADDR');
-        
+
         // Anonymize IP if privacy setting is enabled
         if (config('request-analytics.privacy.anonymize_ip')) {
             return $this->anonymizeIp($ip);
         }
-        
+
         return $ip;
     }
 
@@ -96,6 +96,7 @@ trait CaptureRequest
             // For IPv4, zero out the last octet
             $parts = explode('.', $ip);
             $parts[3] = '0';
+
             return implode('.', $parts);
         } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             // For IPv6, zero out the last 80 bits
@@ -103,9 +104,10 @@ trait CaptureRequest
             for ($i = 3; $i < count($parts); $i++) {
                 $parts[$i] = '0';
             }
+
             return implode(':', $parts);
         }
-        
+
         return $ip;
     }
 
@@ -214,7 +216,8 @@ trait CaptureRequest
 
     protected function isBot(Request $request): bool
     {
-        $botDetector = new BotDetectionService();
+        $botDetector = new BotDetectionService;
+
         return $botDetector->isBot(
             $request->header('User-Agent'),
             $request->ip()
