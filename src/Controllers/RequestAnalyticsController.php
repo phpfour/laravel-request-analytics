@@ -47,8 +47,9 @@ class RequestAnalyticsController extends BaseController
     private function getCountries(): array
     {
         $cacheKey = "analytics_countries_{$this->dateRange}";
+        $cacheTtl = config('request-analytics.cache.ttl', 5);
 
-        return Cache::remember($cacheKey, now()->addMinutes(5), function () {
+        return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () {
             $totalVisitors = $this->getBaseQuery()->count();
 
             if ($totalVisitors === 0) {
@@ -80,8 +81,9 @@ class RequestAnalyticsController extends BaseController
     private function getBrowsers(): array
     {
         $cacheKey = "analytics_browsers_{$this->dateRange}";
+        $cacheTtl = config('request-analytics.cache.ttl', 5);
 
-        return Cache::remember($cacheKey, now()->addMinutes(5), function () {
+        return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () {
             $totalVisitors = $this->getBaseQuery()->count();
 
             if ($totalVisitors === 0) {

@@ -35,4 +35,8 @@ return [
         'anonymize_ip' => env('REQUEST_ANALYTICS_ANONYMIZE_IP', false),
         'respect_dnt' => env('REQUEST_ANALYTICS_RESPECT_DNT', true), // Respect Do Not Track header
     ],
+
+    'cache' => [
+        'ttl' => env('REQUEST_ANALYTICS_CACHE_TTL', 5), // Cache TTL in minutes
+    ],
 ];
