@@ -198,14 +198,16 @@ class RequestAnalyticsController extends BaseController
             return [];
         }
 
+        $domainExpression = $this->getDomainExpression('referrer');
+        
         $referrers = $this->getBaseQuery()
             ->select(
-                DB::raw('SUBSTRING_INDEX(SUBSTRING_INDEX(referrer, "/", 3), "//", -1) as domain'),
+                DB::raw("{$domainExpression} as domain"),
                 DB::raw('COUNT(DISTINCT session_id) as visitorCount')
             )
             ->whereNotNull('referrer')
             ->where('referrer', '!=', '')
-            ->groupBy('domain')
+            ->groupBy(DB::raw($domainExpression))
             ->orderBy('visitorCount', 'desc')
             ->limit(10)
             ->get();
@@ -239,14 +241,16 @@ class RequestAnalyticsController extends BaseController
                 ];
             });
 
+        $dateExpression = $this->getDateExpression('visited_at');
+        
         $dailyData = $this->getBaseQuery()
             ->select(
-                DB::raw('DATE(visited_at) as date'),
+                DB::raw("{$dateExpression} as date"),
                 DB::raw('COUNT(*) as views'),
                 DB::raw('COUNT(DISTINCT session_id) as visitors')
             )
             ->where('visited_at', '>=', $startDate)
-            ->groupBy(DB::raw('DATE(visited_at)'))
+            ->groupBy(DB::raw($dateExpression))
             ->orderBy('date')
             ->get()
             ->keyBy('date');
@@ -307,10 +311,12 @@ class RequestAnalyticsController extends BaseController
 
         // Calculate average visit time (in seconds)
         // This is an approximation based on the difference between first and last hit for each session
+        $durationExpression = $this->getDurationExpression('visited_at');
+        
         $sessionTimes = $this->getBaseQuery()
             ->select(
                 'session_id',
-                DB::raw('TIMESTAMPDIFF(SECOND, MIN(visited_at), MAX(visited_at)) as duration')
+                DB::raw("{$durationExpression} as duration")
             )
             ->groupBy('session_id')
             ->having('duration', '>', 0)
@@ -347,5 +353,52 @@ class RequestAnalyticsController extends BaseController
                 'short' => true,
                 'minimumUnit' => 'second',
             ]);
+    }
+
+    private function getDateExpression(string $column): string
+    {
+        $driver = DB::connection()->getDriverName();
+        
+        return match ($driver) {
+            'mysql' => "DATE({$column})",
+            'pgsql' => "DATE({$column})",
+            'sqlite' => "DATE({$column})",
+            default => "DATE({$column})"
+        };
+    }
+
+    private function getDomainExpression(string $column): string
+    {
+        $driver = DB::connection()->getDriverName();
+        
+        return match ($driver) {
+            'mysql' => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)",
+            'pgsql' => "SPLIT_PART(SPLIT_PART({$column}, '/', 3), '//', 2)",
+            'sqlite' => "CASE 
+                WHEN {$column} LIKE '%://%' THEN 
+                    REPLACE(
+                        REPLACE(
+                            SUBSTR({$column}, INSTR({$column}, '://') + 3),
+                            SUBSTR(SUBSTR({$column}, INSTR({$column}, '://') + 3), INSTR(SUBSTR({$column}, INSTR({$column}, '://') + 3), '/'))
+                            , ''
+                        ), 
+                        'www.', ''
+                    )
+                ELSE {$column}
+                END",
+            default => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)"
+        };
+    }
+
+    private function getDurationExpression(string $column): string
+    {
+        $driver = DB::connection()->getDriverName();
+        
+        return match ($driver) {
+            'mysql' => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))",
+            'pgsql' => "EXTRACT(EPOCH FROM (MAX({$column}) - MIN({$column})))",
+            'sqlite' => "CAST((julianday(MAX({$column})) - julianday(MIN({$column}))) * 86400 AS INTEGER)",
+            default => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))"
+        };
     }
 }

@@ -53,13 +53,15 @@ class AnalyticsService
 
     public function getChartData($query, array $dateRange): array
     {
+        $dateExpression = $this->getDateExpression('visited_at');
+        
         $data = (clone $query)
             ->select(
-                DB::raw('DATE(visited_at) as date'),
+                DB::raw("{$dateExpression} as date"),
                 DB::raw('COUNT(*) as views'),
                 DB::raw('COUNT(DISTINCT visitor_id) as visitors')
             )
-            ->groupBy(DB::raw('DATE(visited_at)'))
+            ->groupBy(DB::raw($dateExpression))
             ->orderBy('date')
             ->get()
             ->keyBy('date');
@@ -106,14 +108,16 @@ class AnalyticsService
 
     public function getTopReferrers($query): array
     {
+        $domainExpression = $this->getDomainExpression('referrer');
+        
         return (clone $query)
             ->select(
-                DB::raw('SUBSTRING_INDEX(SUBSTRING_INDEX(referrer, "/", 3), "//", -1) as domain'),
+                DB::raw("{$domainExpression} as domain"),
                 DB::raw('COUNT(*) as visits')
             )
             ->whereNotNull('referrer')
             ->where('referrer', '!=', '')
-            ->groupBy('domain')
+            ->groupBy(DB::raw($domainExpression))
             ->orderBy('visits', 'desc')
             ->limit(10)
             ->get()
@@ -205,5 +209,40 @@ class AnalyticsService
             ->select('*')
             ->orderBy('visited_at', 'desc')
             ->paginate($perPage);
+    }
+
+    protected function getDateExpression(string $column): string
+    {
+        $driver = DB::connection()->getDriverName();
+        
+        return match ($driver) {
+            'mysql' => "DATE({$column})",
+            'pgsql' => "DATE({$column})",
+            'sqlite' => "DATE({$column})",
+            default => "DATE({$column})"
+        };
+    }
+
+    protected function getDomainExpression(string $column): string
+    {
+        $driver = DB::connection()->getDriverName();
+        
+        return match ($driver) {
+            'mysql' => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)",
+            'pgsql' => "SPLIT_PART(SPLIT_PART({$column}, '/', 3), '//', 2)",
+            'sqlite' => "CASE 
+                WHEN {$column} LIKE '%://%' THEN 
+                    REPLACE(
+                        REPLACE(
+                            SUBSTR({$column}, INSTR({$column}, '://') + 3),
+                            SUBSTR(SUBSTR({$column}, INSTR({$column}, '://') + 3), INSTR(SUBSTR({$column}, INSTR({$column}, '://') + 3), '/'))
+                            , ''
+                        ), 
+                        'www.', ''
+                    )
+                ELSE {$column}
+                END",
+            default => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)"
+        };
     }
 }
