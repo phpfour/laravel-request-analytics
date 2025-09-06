@@ -96,6 +96,7 @@ trait CaptureRequest
             // For IPv4, zero out the last octet
             $parts = explode('.', $ip);
             $parts[3] = '0';
+
             return implode('.', $parts);
         }
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
@@ -105,6 +106,7 @@ trait CaptureRequest
             for ($i = 3; $i < $counter; $i++) {
                 $parts[$i] = '0';
             }
+
             return implode(':', $parts);
         }
 

@@ -14,16 +14,14 @@ use MeShaon\RequestAnalytics\Services\AnalyticsService;
 
 class AnalyticsApiController extends BaseController
 {
-    public function __construct(protected AnalyticsService $analyticsService)
-    {
-    }
+    public function __construct(protected AnalyticsService $analyticsService) {}
 
     public function overview(OverviewRequest $request): JsonResponse
     {
         $params = $request->validated();
         $dateRange = $this->analyticsService->getDateRange($params);
 
-        $data = Cache::remember("api_overview_{$dateRange['key']}", now()->addMinutes(5), fn(): array => $this->analyticsService->getOverviewData($params));
+        $data = Cache::remember("api_overview_{$dateRange['key']}", now()->addMinutes(5), fn (): array => $this->analyticsService->getOverviewData($params));
 
         return response()->json([
             'data' => $data,
