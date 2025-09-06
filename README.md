@@ -150,7 +150,6 @@ The package provides a comprehensive REST API for accessing analytics data:
 - `GET /api/v1/analytics/overview` - Get analytics overview with summary and charts
 - `GET /api/v1/analytics/visitors` - Get paginated visitor data
 - `GET /api/v1/analytics/page-views` - Get paginated page view data
-- `POST /api/v1/analytics/export` - Export analytics data to CSV or JSON
 
 ### API Authentication
 

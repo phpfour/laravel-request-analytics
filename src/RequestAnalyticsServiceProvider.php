@@ -26,6 +26,7 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasRoute('web')
+            ->hasRoute('api')
             ->hasAssets()
             ->hasMigration('create_request_analytics_table')
             ->hasCommand(RequestAnalyticsCommand::class);
