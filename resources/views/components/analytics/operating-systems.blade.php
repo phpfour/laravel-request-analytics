@@ -18,7 +18,7 @@
     @forelse($operatingSystems as $os)
         <x-request-analytics::stats.item
             label="{{ $os['name'] }}"
-            count="{{ $os['visitorCount'] }}"
+            count="{{ $os['count'] }}"
             percentage="{{ $os['percentage'] }}"
             imgSrc="{{ getOperatingSystemImage($os['name']) }}"
         />

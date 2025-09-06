@@ -18,7 +18,7 @@
     @forelse($browsers as $browser)
         <x-request-analytics::stats.item
             label="{{ $browser['browser'] }}"
-            count="{{ $browser['visitorCount'] }}"
+            count="{{ $browser['count'] }}"
             percentage="{{ $browser['percentage'] }}"
             imgSrc="{{ getBrowserImage($browser['browser']) }}"
         />

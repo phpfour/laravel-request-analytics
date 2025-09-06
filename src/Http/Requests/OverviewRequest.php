@@ -19,6 +19,7 @@ class OverviewRequest extends FormRequest
             'date_range' => 'integer|min:1|max:365',
             'start_date' => 'date',
             'end_date' => 'date|after_or_equal:start_date',
+            'with_percentages' => 'boolean',
         ];
     }
 }

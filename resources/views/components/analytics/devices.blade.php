@@ -17,7 +17,7 @@
     @forelse($devices as $device)
         <x-request-analytics::stats.item
             label="{{ $device['name'] }}"
-            count="{{ $device['visitorCount'] }}"
+            count="{{ $device['count'] }}"
             percentage="{{ $device['percentage'] }}"
             imgSrc="{{ getDeviceImage($device['name']) }}"
         />

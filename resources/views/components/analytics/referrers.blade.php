@@ -6,7 +6,7 @@
     @forelse($referrers as $referrer)
         <x-request-analytics::stats.item
             label="{{ $referrer['domain'] }}"
-            count="{{ $referrer['visitorCount'] }}"
+            count="{{ $referrer['visits'] }}"
             percentage="{{ $referrer['percentage'] }}"
         />
     @empty

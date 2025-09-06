@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MeShaon\RequestAnalytics\Services;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
@@ -95,22 +96,40 @@ class AnalyticsService
         ];
     }
 
-    public function getTopPages($query): array
+    public function getTopPages($query, bool $withPercentages = false): array
     {
-        return (clone $query)
+        $pages = (clone $query)
             ->select('path', DB::raw('COUNT(*) as views'))
             ->groupBy('path')
             ->orderBy('views', 'desc')
             ->limit(10)
             ->get()
             ->toArray();
+
+        if (!$withPercentages) {
+            return $pages;
+        }
+
+        $totalViews = array_sum(array_column($pages, 'views'));
+        if ($totalViews === 0) {
+            return [];
+        }
+
+        return collect($pages)->map(function ($page) use ($totalViews) {
+            $percentage = round(($page['views'] / $totalViews) * 100, 1);
+            return [
+                'path' => $page['path'],
+                'views' => $page['views'],
+                'percentage' => $percentage,
+            ];
+        })->toArray();
     }
 
-    public function getTopReferrers($query): array
+    public function getTopReferrers($query, bool $withPercentages = false): array
     {
         $domainExpression = $this->getDomainExpression('referrer');
         
-        return (clone $query)
+        $referrers = (clone $query)
             ->select(
                 DB::raw("{$domainExpression} as domain"),
                 DB::raw('COUNT(*) as visits')
@@ -122,11 +141,40 @@ class AnalyticsService
             ->limit(10)
             ->get()
             ->toArray();
+
+        if (!$withPercentages) {
+            return $referrers;
+        }
+
+        $totalVisits = array_sum(array_column($referrers, 'visits'));
+        if ($totalVisits === 0) {
+            return [];
+        }
+
+        return collect($referrers)->map(function ($referrer) use ($totalVisits) {
+            $percentage = round(($referrer['visits'] / $totalVisits) * 100, 1);
+            return [
+                'domain' => $referrer['domain'] ?: '(direct)',
+                'visits' => $referrer['visits'],
+                'percentage' => $percentage,
+            ];
+        })->toArray();
     }
 
-    public function getBrowsers($query): array
+    public function getBrowsers($query, bool $withPercentages = false, string $cacheKey = null, int $cacheTtl = null): array
     {
-        return (clone $query)
+        if ($cacheKey && $cacheTtl) {
+            return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () use ($query, $withPercentages) {
+                return $this->getBrowsersData($query, $withPercentages);
+            });
+        }
+
+        return $this->getBrowsersData($query, $withPercentages);
+    }
+
+    protected function getBrowsersData($query, bool $withPercentages): array
+    {
+        $browsers = (clone $query)
             ->select('browser', DB::raw('COUNT(*) as count'))
             ->whereNotNull('browser')
             ->groupBy('browser')
@@ -134,11 +182,29 @@ class AnalyticsService
             ->limit(10)
             ->get()
             ->toArray();
+
+        if (!$withPercentages) {
+            return $browsers;
+        }
+
+        $totalCount = array_sum(array_column($browsers, 'count'));
+        if ($totalCount === 0) {
+            return [];
+        }
+
+        return collect($browsers)->map(function ($browser) use ($totalCount) {
+            $percentage = round(($browser['count'] / $totalCount) * 100, 1);
+            return [
+                'browser' => $browser['browser'],
+                'count' => $browser['count'],
+                'percentage' => $percentage,
+            ];
+        })->toArray();
     }
 
-    public function getDevices($query): array
+    public function getDevices($query, bool $withPercentages = false): array
     {
-        return (clone $query)
+        $devices = (clone $query)
             ->select('device', DB::raw('COUNT(*) as count'))
             ->whereNotNull('device')
             ->groupBy('device')
@@ -146,11 +212,40 @@ class AnalyticsService
             ->limit(10)
             ->get()
             ->toArray();
+
+        if (!$withPercentages) {
+            return $devices;
+        }
+
+        $totalCount = array_sum(array_column($devices, 'count'));
+        if ($totalCount === 0) {
+            return [];
+        }
+
+        return collect($devices)->map(function ($device) use ($totalCount) {
+            $percentage = round(($device['count'] / $totalCount) * 100, 1);
+            return [
+                'name' => $device['device'],
+                'count' => $device['count'],
+                'percentage' => $percentage,
+            ];
+        })->toArray();
     }
 
-    public function getCountries($query): array
+    public function getCountries($query, bool $withPercentages = false, string $cacheKey = null, int $cacheTtl = null): array
     {
-        return (clone $query)
+        if ($cacheKey && $cacheTtl) {
+            return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () use ($query, $withPercentages) {
+                return $this->getCountriesData($query, $withPercentages);
+            });
+        }
+
+        return $this->getCountriesData($query, $withPercentages);
+    }
+
+    protected function getCountriesData($query, bool $withPercentages): array
+    {
+        $countries = (clone $query)
             ->select('country', DB::raw('COUNT(*) as count'))
             ->whereNotNull('country')
             ->where('country', '!=', '')
@@ -159,21 +254,72 @@ class AnalyticsService
             ->limit(10)
             ->get()
             ->toArray();
+
+        if (!$withPercentages) {
+            return $countries;
+        }
+
+        $totalCount = array_sum(array_column($countries, 'count'));
+        if ($totalCount === 0) {
+            return [];
+        }
+
+        return collect($countries)->map(function ($country) use ($totalCount) {
+            $percentage = round(($country['count'] / $totalCount) * 100, 1);
+            return [
+                'name' => $country['country'],
+                'count' => $country['count'],
+                'percentage' => $percentage,
+                'code' => strtolower($country['country']),
+            ];
+        })->toArray();
+    }
+
+    public function getOperatingSystems($query, bool $withPercentages = false): array
+    {
+        $totalVisitors = (clone $query)->distinct('session_id')->count('session_id');
+        if ($totalVisitors === 0) {
+            return [];
+        }
+
+        $operatingSystems = (clone $query)
+            ->select('operating_system as name', DB::raw('COUNT(DISTINCT session_id) as count'))
+            ->whereNotNull('operating_system')
+            ->groupBy('operating_system')
+            ->orderBy('count', 'desc')
+            ->limit(10)
+            ->get()
+            ->toArray();
+
+        if (!$withPercentages) {
+            return $operatingSystems;
+        }
+
+        return collect($operatingSystems)->map(function ($os) use ($totalVisitors) {
+            $percentage = round(($os['count'] / $totalVisitors) * 100, 1);
+            return [
+                'name' => $os['name'],
+                'count' => $os['count'],
+                'percentage' => $percentage,
+            ];
+        })->toArray();
     }
 
     public function getOverviewData(array $params): array
     {
         $dateRange = $this->getDateRange($params);
         $query = $this->getBaseQuery($dateRange);
+        $withPercentages = $params['with_percentages'] ?? false;
 
         return [
             'summary' => $this->getSummary($query),
             'chart' => $this->getChartData($query, $dateRange),
-            'top_pages' => $this->getTopPages($query),
-            'top_referrers' => $this->getTopReferrers($query),
-            'browsers' => $this->getBrowsers($query),
-            'devices' => $this->getDevices($query),
-            'countries' => $this->getCountries($query),
+            'top_pages' => $this->getTopPages($query, $withPercentages),
+            'top_referrers' => $this->getTopReferrers($query, $withPercentages),
+            'browsers' => $this->getBrowsers($query, $withPercentages),
+            'devices' => $this->getDevices($query, $withPercentages),
+            'countries' => $this->getCountries($query, $withPercentages),
+            'operating_systems' => $this->getOperatingSystems($query, $withPercentages),
         ];
     }
 
@@ -211,7 +357,7 @@ class AnalyticsService
             ->paginate($perPage);
     }
 
-    protected function getDateExpression(string $column): string
+    public function getDateExpression(string $column): string
     {
         $driver = DB::connection()->getDriverName();
         
@@ -223,7 +369,7 @@ class AnalyticsService
         };
     }
 
-    protected function getDomainExpression(string $column): string
+    public function getDomainExpression(string $column): string
     {
         $driver = DB::connection()->getDriverName();
         
@@ -245,4 +391,17 @@ class AnalyticsService
             default => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)"
         };
     }
+
+    public function getDurationExpression(string $column): string
+    {
+        $driver = DB::connection()->getDriverName();
+        
+        return match ($driver) {
+            'mysql' => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))",
+            'pgsql' => "EXTRACT(EPOCH FROM (MAX({$column}) - MIN({$column})))",
+            'sqlite' => "CAST((julianday(MAX({$column})) - julianday(MIN({$column}))) * 86400 AS INTEGER)",
+            default => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))"
+        };
+    }
+
 }
