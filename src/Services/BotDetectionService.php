@@ -52,12 +52,13 @@ class BotDetectionService
             return true; // No user agent is suspicious
         }
 
-        // Check user agent patterns
+        // Check user agent patterns using collection methods
         $userAgentLower = strtolower($userAgent);
-        foreach ($this->botPatterns as $pattern) {
-            if (str_contains($userAgentLower, (string) $pattern)) {
-                return true;
-            }
+        $hasPattern = collect($this->botPatterns)
+            ->contains(fn ($pattern): bool => str_contains($userAgentLower, (string) $pattern));
+
+        if ($hasPattern) {
+            return true;
         }
 
         // Check IP ranges if provided
@@ -73,13 +74,8 @@ class BotDetectionService
 
     protected function isIpInBotRange(string $ip): bool
     {
-        foreach ($this->botIpRanges as $range) {
-            if ($this->ipInRange($ip, $range)) {
-                return true;
-            }
-        }
-
-        return false;
+        return collect($this->botIpRanges)
+            ->contains(fn ($range): bool => $this->ipInRange($ip, $range));
     }
 
     protected function ipInRange(string $ip, string $range): bool
@@ -127,12 +123,7 @@ class BotDetectionService
             'uptimerobot' => 'UptimeRobot',
         ];
 
-        foreach ($botNames as $pattern => $name) {
-            if (str_contains($userAgentLower, $pattern)) {
-                return $name;
-            }
-        }
-
-        return null;
+        return collect($botNames)
+            ->first(fn ($name, $pattern): bool => str_contains($userAgentLower, (string) $pattern));
     }
 }
