@@ -1,11 +1,14 @@
-name: Rector
+name: Fix code with Rector
 
 on:
   push:
     paths:
       - '**.php'
       - 'rector.php'
-      - '.github/workflows/phpstan.yml'
+      - '.github/workflows/rector.yml'
+
+permissions:
+  contents: write
 
 jobs:
   rector:
@@ -13,7 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -25,4 +31,9 @@ jobs:
         uses: ramsey/composer-install@v3
 
       - name: Run Rector
-        run: ./vendor/bin/rector process --dry-run
+        run: ./vendor/bin/rector process
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: Apply Rector changes
