@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MeShaon\RequestAnalytics\Services;
 
 class BotDetectionService
@@ -46,14 +48,14 @@ class BotDetectionService
 
     public function isBot(?string $userAgent, ?string $ipAddress = null): bool
     {
-        if (empty($userAgent)) {
+        if ($userAgent === null || $userAgent === '' || $userAgent === '0') {
             return true; // No user agent is suspicious
         }
 
         // Check user agent patterns
         $userAgentLower = strtolower($userAgent);
         foreach ($this->botPatterns as $pattern) {
-            if (str_contains($userAgentLower, $pattern)) {
+            if (str_contains($userAgentLower, (string) $pattern)) {
                 return true;
             }
         }
@@ -64,13 +66,9 @@ class BotDetectionService
         }
 
         // Check for missing browser indicators
-        if (! str_contains($userAgentLower, 'mozilla') &&
+        return ! str_contains($userAgentLower, 'mozilla') &&
             ! str_contains($userAgentLower, 'opera') &&
-            ! str_contains($userAgentLower, 'webkit')) {
-            return true;
-        }
-
-        return false;
+            ! str_contains($userAgentLower, 'webkit');
     }
 
     protected function isIpInBotRange(string $ip): bool
@@ -86,7 +84,7 @@ class BotDetectionService
 
     protected function ipInRange(string $ip, string $range): bool
     {
-        if (strpos($range, '/') === false) {
+        if (! str_contains($range, '/')) {
             return $ip === $range;
         }
 
@@ -96,12 +94,12 @@ class BotDetectionService
         $mask = -1 << (32 - $bits);
         $subnet &= $mask;
 
-        return ($ip & $mask) == $subnet;
+        return ($ip & $mask) === $subnet;
     }
 
     public function getBotName(?string $userAgent): ?string
     {
-        if (empty($userAgent)) {
+        if ($userAgent === null || $userAgent === '' || $userAgent === '0') {
             return null;
         }
 

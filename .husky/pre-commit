@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Get staged PHP files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.php$')
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "No staged PHP files found."
+    exit 0
+fi
+
+echo "Running Pint on staged files..."
+./vendor/bin/pint $STAGED_FILES
+
+# Add formatted files back to staging
+git add $STAGED_FILES
+
+echo "Running Rector on staged files..."
+./vendor/bin/rector process $STAGED_FILES
+
+# Add any files that Rector may have modified back to staging
+git add $STAGED_FILES
+
+echo "All checks and fixes completed!"

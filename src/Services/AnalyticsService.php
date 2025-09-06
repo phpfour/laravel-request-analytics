@@ -115,7 +115,7 @@ class AnalyticsService
             return [];
         }
 
-        return collect($pages)->map(function ($page) use ($totalViews) {
+        return collect($pages)->map(function (array $page) use ($totalViews): array {
             $percentage = round(($page['views'] / $totalViews) * 100, 1);
 
             return [
@@ -152,7 +152,7 @@ class AnalyticsService
             return [];
         }
 
-        return collect($referrers)->map(function ($referrer) use ($totalVisits) {
+        return collect($referrers)->map(function (array $referrer) use ($totalVisits): array {
             $percentage = round(($referrer['visits'] / $totalVisits) * 100, 1);
 
             return [
@@ -166,9 +166,7 @@ class AnalyticsService
     public function getBrowsers($query, bool $withPercentages = false, ?string $cacheKey = null, ?int $cacheTtl = null): array
     {
         if ($cacheKey && $cacheTtl) {
-            return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () use ($query, $withPercentages) {
-                return $this->getBrowsersData($query, $withPercentages);
-            });
+            return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), fn (): array => $this->getBrowsersData($query, $withPercentages));
         }
 
         return $this->getBrowsersData($query, $withPercentages);
@@ -194,7 +192,7 @@ class AnalyticsService
             return [];
         }
 
-        return collect($browsers)->map(function ($browser) use ($totalCount) {
+        return collect($browsers)->map(function (array $browser) use ($totalCount): array {
             $percentage = round(($browser['count'] / $totalCount) * 100, 1);
 
             return [
@@ -225,7 +223,7 @@ class AnalyticsService
             return [];
         }
 
-        return collect($devices)->map(function ($device) use ($totalCount) {
+        return collect($devices)->map(function (array $device) use ($totalCount): array {
             $percentage = round(($device['count'] / $totalCount) * 100, 1);
 
             return [
@@ -239,9 +237,7 @@ class AnalyticsService
     public function getCountries($query, bool $withPercentages = false, ?string $cacheKey = null, ?int $cacheTtl = null): array
     {
         if ($cacheKey && $cacheTtl) {
-            return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () use ($query, $withPercentages) {
-                return $this->getCountriesData($query, $withPercentages);
-            });
+            return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), fn (): array => $this->getCountriesData($query, $withPercentages));
         }
 
         return $this->getCountriesData($query, $withPercentages);
@@ -268,14 +264,14 @@ class AnalyticsService
             return [];
         }
 
-        return collect($countries)->map(function ($country) use ($totalCount) {
+        return collect($countries)->map(function (array $country) use ($totalCount): array {
             $percentage = round(($country['count'] / $totalCount) * 100, 1);
 
             return [
                 'name' => $country['country'],
                 'count' => $country['count'],
                 'percentage' => $percentage,
-                'code' => strtolower($country['country']),
+                'code' => strtolower((string) $country['country']),
             ];
         })->toArray();
     }
@@ -300,7 +296,7 @@ class AnalyticsService
             return $operatingSystems;
         }
 
-        return collect($operatingSystems)->map(function ($os) use ($totalVisitors) {
+        return collect($operatingSystems)->map(function (array $os) use ($totalVisitors): array {
             $percentage = round(($os['count'] / $totalVisitors) * 100, 1);
 
             return [
@@ -365,7 +361,8 @@ class AnalyticsService
 
     public function getDateExpression(string $column): string
     {
-        $driver = DB::connection()->getDriverName();
+        $connection = config('request-analytics.database.connection');
+        $driver = DB::connection($connection)->getDriverName();
 
         return match ($driver) {
             'mysql' => "DATE({$column})",
@@ -377,7 +374,8 @@ class AnalyticsService
 
     public function getDomainExpression(string $column): string
     {
-        $driver = DB::connection()->getDriverName();
+        $connection = config('request-analytics.database.connection');
+        $driver = DB::connection($connection)->getDriverName();
 
         return match ($driver) {
             'mysql' => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)",
@@ -400,7 +398,8 @@ class AnalyticsService
 
     public function getDurationExpression(string $column): string
     {
-        $driver = DB::connection()->getDriverName();
+        $connection = config('request-analytics.database.connection');
+        $driver = DB::connection($connection)->getDriverName();
 
         return match ($driver) {
             'mysql' => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))",

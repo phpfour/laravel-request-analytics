@@ -10,15 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardAnalyticsService
 {
-    protected int $dateRange;
-
-    protected AnalyticsService $analyticsService;
-
-    public function __construct(AnalyticsService $analyticsService, int $dateRange = 30)
-    {
-        $this->analyticsService = $analyticsService;
-        $this->dateRange = $dateRange;
-    }
+    public function __construct(protected AnalyticsService $analyticsService, protected int $dateRange = 30) {}
 
     public function setDateRange(int $dateRange): self
     {
@@ -64,7 +56,7 @@ class DashboardAnalyticsService
         $chartData = $this->analyticsService->getChartData($query, $dateRange);
 
         // Add dashboard-specific styling
-        $chartData['datasets'] = collect($chartData['datasets'])->map(function ($dataset) {
+        $chartData['datasets'] = collect($chartData['datasets'])->map(function (array $dataset): array {
             if ($dataset['label'] === 'Views') {
                 return array_merge($dataset, [
                     'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
@@ -96,8 +88,11 @@ class DashboardAnalyticsService
         $uniqueVisitors = $baseQuery->distinct('session_id')->count('session_id');
 
         // Calculate bounce rate (percentage of sessions with only one page view)
-        $sessionsWithSinglePageView = DB::table(function ($query) use ($startDate) {
-            $query->from('request_analytics')
+        $tableName = config('request-analytics.database.table', 'request_analytics');
+        $connection = config('request-analytics.database.connection');
+
+        $sessionsWithSinglePageView = DB::connection($connection)->table(function ($query) use ($startDate, $tableName): void {
+            $query->from($tableName)
                 ->select('session_id')
                 ->where('visited_at', '>=', $startDate)
                 ->groupBy('session_id')

@@ -8,7 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('request_analytics', function (Blueprint $table) {
+        $tableName = config('request-analytics.database.table', 'request_analytics');
+        $connection = config('request-analytics.database.connection');
+        
+        Schema::connection($connection)->table($tableName, function (Blueprint $table) {
             $table->index('visited_at');
             $table->index('session_id');
             $table->index('path');
@@ -24,7 +27,10 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('request_analytics', function (Blueprint $table) {
+        $tableName = config('request-analytics.database.table', 'request_analytics');
+        $connection = config('request-analytics.database.connection');
+        
+        Schema::connection($connection)->table($tableName, function (Blueprint $table) {
             $table->dropIndex(['visited_at']);
             $table->dropIndex(['session_id']);
             $table->dropIndex(['path']);

@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'database' => [
+        'connection' => env('REQUEST_ANALYTICS_DB_CONNECTION', null), // Use default connection if null
+        'table' => env('REQUEST_ANALYTICS_TABLE_NAME', 'request_analytics'),
+    ],
+
     'route' => [
         'name' => 'request.analytics',
         'pathname' => env('REQUEST_ANALYTICS_PATHNAME', 'analytics'),

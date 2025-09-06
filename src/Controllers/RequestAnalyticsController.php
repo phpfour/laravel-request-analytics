@@ -10,12 +10,7 @@ use MeShaon\RequestAnalytics\Services\DashboardAnalyticsService;
 
 class RequestAnalyticsController extends BaseController
 {
-    protected DashboardAnalyticsService $dashboardService;
-
-    public function __construct(DashboardAnalyticsService $dashboardService)
-    {
-        $this->dashboardService = $dashboardService;
-    }
+    public function __construct(protected DashboardAnalyticsService $dashboardService) {}
 
     public function show(Request $request)
     {

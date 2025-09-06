@@ -1,0 +1,32 @@
+{
+  "name": "laravel-request-analytics",
+  "version": "1.0.0",
+  "description": "Simple request data analytics package for Laravel projects",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "composer run format",
+    "refactor": "composer run refactor",
+    "refactor-fix": "composer run refactor-fix",
+    "pre-commit": "composer run format && composer run refactor-fix"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/me-shaon/laravel-request-analytics.git"
+  },
+  "keywords": [
+    "laravel",
+    "php",
+    "analytics",
+    "request-analytics"
+  ],
+  "author": "Ahmed shamim <shaon.cse81@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/me-shaon/laravel-request-analytics/issues"
+  },
+  "homepage": "https://github.com/me-shaon/laravel-request-analytics#readme"
+}
