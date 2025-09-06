@@ -8,17 +8,15 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use MeShaon\RequestAnalytics\Http\Requests\OverviewRequest;
+use MeShaon\RequestAnalytics\Http\Requests\PageViewsRequest;
+use MeShaon\RequestAnalytics\Http\Requests\VisitorsRequest;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
 
 class AnalyticsApiController extends BaseController
 {
-    public function overview(Request $request): JsonResponse
+    public function overview(OverviewRequest $request): JsonResponse
     {
-        $request->validate([
-            'date_range' => 'integer|min:1|max:365',
-            'start_date' => 'date',
-            'end_date' => 'date|after_or_equal:start_date',
-        ]);
 
         $dateRange = $this->getDateRange($request);
 
@@ -43,13 +41,8 @@ class AnalyticsApiController extends BaseController
         ]);
     }
 
-    public function visitors(Request $request): JsonResponse
+    public function visitors(VisitorsRequest $request): JsonResponse
     {
-        $request->validate([
-            'date_range' => 'integer|min:1|max:365',
-            'page' => 'integer|min:1',
-            'per_page' => 'integer|min:10|max:100',
-        ]);
 
         $dateRange = $this->getDateRange($request);
         $perPage = $request->input('per_page', 50);
@@ -74,14 +67,8 @@ class AnalyticsApiController extends BaseController
         ]);
     }
 
-    public function pageViews(Request $request): JsonResponse
+    public function pageViews(PageViewsRequest $request): JsonResponse
     {
-        $request->validate([
-            'date_range' => 'integer|min:1|max:365',
-            'path' => 'string',
-            'page' => 'integer|min:1',
-            'per_page' => 'integer|min:10|max:100',
-        ]);
 
         $dateRange = $this->getDateRange($request);
         $perPage = $request->input('per_page', 50);
