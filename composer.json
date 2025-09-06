@@ -70,10 +70,7 @@
         "laravel": {
             "providers": [
                 "MeShaon\\RequestAnalytics\\RequestAnalyticsServiceProvider"
-            ],
-            "aliases": {
-                "RequestAnalytics": "MeShaon\\RequestAnalytics\\Facades\\RequestAnalytics"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",
