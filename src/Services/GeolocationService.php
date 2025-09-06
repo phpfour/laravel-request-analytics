@@ -2,6 +2,8 @@
 
 namespace MeShaon\RequestAnalytics\Services;
 
+use GeoIp2\Database\Reader;
+use GeoIp2\Exception\AddressNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -119,9 +121,111 @@ class GeolocationService
 
     protected function lookupWithMaxMind(string $ip): array
     {
-        // This would require the GeoIP2 PHP library
-        // composer require geoip2/geoip2
-        // Implementation would depend on whether using web service or local database
+        $maxmindType = config('request-analytics.geolocation.maxmind.type', 'webservice');
+
+        return match ($maxmindType) {
+            'database' => $this->lookupWithMaxMindDatabase($ip),
+            'webservice' => $this->lookupWithMaxMindWebService($ip),
+            default => $this->getDefaultLocation(),
+        };
+    }
+
+    protected function lookupWithMaxMindWebService(string $ip): array
+    {
+        $userId = config('request-analytics.geolocation.maxmind.user_id');
+        $licenseKey = config('request-analytics.geolocation.maxmind.license_key');
+
+        if (! $userId || ! $licenseKey) {
+            Log::warning('MaxMind web service credentials not configured');
+
+            return $this->getDefaultLocation();
+        }
+
+        try {
+            $response = Http::timeout(10)
+                ->withBasicAuth($userId, $licenseKey)
+                ->get("https://geoip.maxmind.com/geoip/v2.1/city/{$ip}");
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                return [
+                    'country' => $data['country']['names']['en'] ?? '',
+                    'country_code' => $data['country']['iso_code'] ?? '',
+                    'region' => $data['subdivisions'][0]['names']['en'] ?? '',
+                    'city' => $data['city']['names']['en'] ?? '',
+                    'latitude' => $data['location']['latitude'] ?? null,
+                    'longitude' => $data['location']['longitude'] ?? null,
+                    'timezone' => $data['location']['time_zone'] ?? '',
+                    'isp' => $data['traits']['isp'] ?? '',
+                ];
+            }
+
+            if ($response->status() === 404) {
+                // IP not found in database
+                return $this->getDefaultLocation();
+            }
+
+            Log::warning('MaxMind web service returned error', [
+                'ip' => $ip,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::warning('MaxMind web service lookup failed', [
+                'ip' => $ip,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $this->getDefaultLocation();
+    }
+
+    protected function lookupWithMaxMindDatabase(string $ip): array
+    {
+        $databasePath = config('request-analytics.geolocation.maxmind.database_path');
+
+        if (! $databasePath || ! file_exists($databasePath)) {
+            Log::warning('MaxMind database file not found', [
+                'path' => $databasePath,
+            ]);
+
+            return $this->getDefaultLocation();
+        }
+
+        // Check if GeoIP2 library is available
+        if (! class_exists('GeoIp2\Database\Reader')) {
+            Log::warning('GeoIP2 library not installed. Please run: composer require geoip2/geoip2');
+
+            return $this->getDefaultLocation();
+        }
+
+        try {
+            $reader = new Reader($databasePath);
+            $record = $reader->city($ip);
+
+            return [
+                'country' => $record->country->name ?? '',
+                'country_code' => $record->country->isoCode ?? '',
+                'region' => $record->mostSpecificSubdivision->name ?? '',
+                'city' => $record->city->name ?? '',
+                'latitude' => $record->location->latitude,
+                'longitude' => $record->location->longitude,
+                'timezone' => $record->location->timeZone ?? '',
+                'isp' => '', // ISP data requires separate database
+            ];
+
+        } catch (AddressNotFoundException) {
+            // IP not found in database - this is normal for some IPs
+            return $this->getDefaultLocation();
+        } catch (\Exception $e) {
+            Log::warning('MaxMind database lookup failed', [
+                'ip' => $ip,
+                'database' => $databasePath,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $this->getDefaultLocation();
     }

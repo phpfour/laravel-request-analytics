@@ -34,6 +34,14 @@ return [
         'enabled' => env('REQUEST_ANALYTICS_GEO_ENABLED', true),
         'provider' => env('REQUEST_ANALYTICS_GEO_PROVIDER', 'ipapi'), // ipapi, ipgeolocation, maxmind
         'api_key' => env('REQUEST_ANALYTICS_GEO_API_KEY'),
+
+        // MaxMind specific configuration
+        'maxmind' => [
+            'type' => env('REQUEST_ANALYTICS_MAXMIND_TYPE', 'webservice'), // webservice or database
+            'user_id' => env('REQUEST_ANALYTICS_MAXMIND_USER_ID'),
+            'license_key' => env('REQUEST_ANALYTICS_MAXMIND_LICENSE_KEY'),
+            'database_path' => env('REQUEST_ANALYTICS_MAXMIND_DB_PATH', storage_path('app/GeoLite2-City.mmdb')),
+        ],
     ],
 
     'privacy' => [
