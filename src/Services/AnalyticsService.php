@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MeShaon\RequestAnalytics\Services;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
 
 class AnalyticsService
@@ -55,7 +55,7 @@ class AnalyticsService
     public function getChartData($query, array $dateRange): array
     {
         $dateExpression = $this->getDateExpression('visited_at');
-        
+
         $data = (clone $query)
             ->select(
                 DB::raw("{$dateExpression} as date"),
@@ -106,7 +106,7 @@ class AnalyticsService
             ->get()
             ->toArray();
 
-        if (!$withPercentages) {
+        if (! $withPercentages) {
             return $pages;
         }
 
@@ -117,6 +117,7 @@ class AnalyticsService
 
         return collect($pages)->map(function ($page) use ($totalViews) {
             $percentage = round(($page['views'] / $totalViews) * 100, 1);
+
             return [
                 'path' => $page['path'],
                 'views' => $page['views'],
@@ -128,7 +129,7 @@ class AnalyticsService
     public function getTopReferrers($query, bool $withPercentages = false): array
     {
         $domainExpression = $this->getDomainExpression('referrer');
-        
+
         $referrers = (clone $query)
             ->select(
                 DB::raw("{$domainExpression} as domain"),
@@ -142,7 +143,7 @@ class AnalyticsService
             ->get()
             ->toArray();
 
-        if (!$withPercentages) {
+        if (! $withPercentages) {
             return $referrers;
         }
 
@@ -153,6 +154,7 @@ class AnalyticsService
 
         return collect($referrers)->map(function ($referrer) use ($totalVisits) {
             $percentage = round(($referrer['visits'] / $totalVisits) * 100, 1);
+
             return [
                 'domain' => $referrer['domain'] ?: '(direct)',
                 'visits' => $referrer['visits'],
@@ -161,7 +163,7 @@ class AnalyticsService
         })->toArray();
     }
 
-    public function getBrowsers($query, bool $withPercentages = false, string $cacheKey = null, int $cacheTtl = null): array
+    public function getBrowsers($query, bool $withPercentages = false, ?string $cacheKey = null, ?int $cacheTtl = null): array
     {
         if ($cacheKey && $cacheTtl) {
             return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () use ($query, $withPercentages) {
@@ -183,7 +185,7 @@ class AnalyticsService
             ->get()
             ->toArray();
 
-        if (!$withPercentages) {
+        if (! $withPercentages) {
             return $browsers;
         }
 
@@ -194,6 +196,7 @@ class AnalyticsService
 
         return collect($browsers)->map(function ($browser) use ($totalCount) {
             $percentage = round(($browser['count'] / $totalCount) * 100, 1);
+
             return [
                 'browser' => $browser['browser'],
                 'count' => $browser['count'],
@@ -213,7 +216,7 @@ class AnalyticsService
             ->get()
             ->toArray();
 
-        if (!$withPercentages) {
+        if (! $withPercentages) {
             return $devices;
         }
 
@@ -224,6 +227,7 @@ class AnalyticsService
 
         return collect($devices)->map(function ($device) use ($totalCount) {
             $percentage = round(($device['count'] / $totalCount) * 100, 1);
+
             return [
                 'name' => $device['device'],
                 'count' => $device['count'],
@@ -232,7 +236,7 @@ class AnalyticsService
         })->toArray();
     }
 
-    public function getCountries($query, bool $withPercentages = false, string $cacheKey = null, int $cacheTtl = null): array
+    public function getCountries($query, bool $withPercentages = false, ?string $cacheKey = null, ?int $cacheTtl = null): array
     {
         if ($cacheKey && $cacheTtl) {
             return Cache::remember($cacheKey, now()->addMinutes($cacheTtl), function () use ($query, $withPercentages) {
@@ -255,7 +259,7 @@ class AnalyticsService
             ->get()
             ->toArray();
 
-        if (!$withPercentages) {
+        if (! $withPercentages) {
             return $countries;
         }
 
@@ -266,6 +270,7 @@ class AnalyticsService
 
         return collect($countries)->map(function ($country) use ($totalCount) {
             $percentage = round(($country['count'] / $totalCount) * 100, 1);
+
             return [
                 'name' => $country['country'],
                 'count' => $country['count'],
@@ -291,12 +296,13 @@ class AnalyticsService
             ->get()
             ->toArray();
 
-        if (!$withPercentages) {
+        if (! $withPercentages) {
             return $operatingSystems;
         }
 
         return collect($operatingSystems)->map(function ($os) use ($totalVisitors) {
             $percentage = round(($os['count'] / $totalVisitors) * 100, 1);
+
             return [
                 'name' => $os['name'],
                 'count' => $os['count'],
@@ -360,7 +366,7 @@ class AnalyticsService
     public function getDateExpression(string $column): string
     {
         $driver = DB::connection()->getDriverName();
-        
+
         return match ($driver) {
             'mysql' => "DATE({$column})",
             'pgsql' => "DATE({$column})",
@@ -372,7 +378,7 @@ class AnalyticsService
     public function getDomainExpression(string $column): string
     {
         $driver = DB::connection()->getDriverName();
-        
+
         return match ($driver) {
             'mysql' => "SUBSTRING_INDEX(SUBSTRING_INDEX({$column}, '/', 3), '//', -1)",
             'pgsql' => "SPLIT_PART(SPLIT_PART({$column}, '/', 3), '//', 2)",
@@ -395,7 +401,7 @@ class AnalyticsService
     public function getDurationExpression(string $column): string
     {
         $driver = DB::connection()->getDriverName();
-        
+
         return match ($driver) {
             'mysql' => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))",
             'pgsql' => "EXTRACT(EPOCH FROM (MAX({$column}) - MIN({$column})))",
@@ -403,5 +409,4 @@ class AnalyticsService
             default => "TIMESTAMPDIFF(SECOND, MIN({$column}), MAX({$column}))"
         };
     }
-
 }

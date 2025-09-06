@@ -21,7 +21,7 @@ class RequestAnalyticsController extends BaseController
     {
         $dateRange = $request->input('date_range', 30);
         $this->dashboardService->setDateRange($dateRange);
-        
+
         $data = $this->dashboardService->getDashboardData();
 
         return view('request-analytics::analytics', $data);

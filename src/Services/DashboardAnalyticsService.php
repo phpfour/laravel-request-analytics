@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 class DashboardAnalyticsService
 {
     protected int $dateRange;
+
     protected AnalyticsService $analyticsService;
 
     public function __construct(AnalyticsService $analyticsService, int $dateRange = 30)
@@ -22,6 +23,7 @@ class DashboardAnalyticsService
     public function setDateRange(int $dateRange): self
     {
         $this->dateRange = $dateRange;
+
         return $this;
     }
 
@@ -30,7 +32,7 @@ class DashboardAnalyticsService
         $dateRange = $this->getDateRange();
         $query = $this->analyticsService->getBaseQuery($dateRange);
         $cacheTtl = config('request-analytics.cache.ttl', 5);
-        
+
         $chartData = $this->getChartData();
 
         return [
@@ -51,7 +53,7 @@ class DashboardAnalyticsService
     {
         return [
             'start' => Carbon::now()->subDays($this->dateRange)->startOfDay(),
-            'end' => Carbon::now()->endOfDay()
+            'end' => Carbon::now()->endOfDay(),
         ];
     }
 
@@ -60,7 +62,7 @@ class DashboardAnalyticsService
         $dateRange = $this->getDateRange();
         $query = $this->analyticsService->getBaseQuery($dateRange);
         $chartData = $this->analyticsService->getChartData($query, $dateRange);
-        
+
         // Add dashboard-specific styling
         $chartData['datasets'] = collect($chartData['datasets'])->map(function ($dataset) {
             if ($dataset['label'] === 'Views') {
@@ -77,9 +79,10 @@ class DashboardAnalyticsService
                     'borderWidth' => 1,
                 ]);
             }
+
             return $dataset;
         })->toArray();
-        
+
         return $chartData;
     }
 
