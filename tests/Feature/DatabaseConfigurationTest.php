@@ -12,7 +12,7 @@ beforeEach(function (): void {
     Config::set('request-analytics.capture.bots', false);
 
     // Set up a basic route for testing
-    $this->app['router']->get('/', fn() => response('Hello World'));
+    $this->app['router']->get('/', fn () => response('Hello World'));
 
     // Create the default table for basic tests
     if (! Schema::hasTable('request_analytics')) {
