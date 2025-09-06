@@ -103,23 +103,6 @@ class AnalyticsApiController extends BaseController
         ]);
     }
 
-    public function export(Request $request): JsonResponse
-    {
-        $request->validate([
-            'format' => 'required|in:csv,json',
-            'date_range' => 'integer|min:1|max:365',
-            'type' => 'required|in:overview,visitors,page_views',
-        ]);
-
-        // This would typically queue a job for large exports
-        // For now, we'll return a simple response
-        return response()->json([
-            'success' => true,
-            'message' => 'Export queued successfully',
-            'job_id' => uniqid('export_'),
-        ]);
-    }
-
     protected function getDateRange(Request $request): array
     {
         if ($request->has('start_date') && $request->has('end_date')) {

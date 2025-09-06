@@ -68,18 +68,3 @@ it('validates date range parameters', function () {
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['date_range']);
 });
-
-it('queues export job', function () {
-    $response = $this->postJson('/api/v1/analytics/export', [
-        'format' => 'csv',
-        'type' => 'overview',
-        'date_range' => 30,
-    ]);
-
-    $response->assertStatus(200)
-        ->assertJsonStructure([
-            'success',
-            'message',
-            'job_id',
-        ]);
-});

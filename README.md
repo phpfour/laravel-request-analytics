@@ -135,7 +135,6 @@ php artisan vendor:publish --tag="request-analytics-views"
 - 🚀 **High Performance** - Built-in caching and optimized database queries
 - 📱 **Device Detection** - Track browsers, operating systems, and devices
 - 👥 **Visitor Tracking** - Unique visitor identification with cookie-based tracking
-- 📤 **Export Data** - Export analytics data to CSV or JSON formats
 - 🔌 **REST API** - Full-featured API for programmatic access
 - 🧹 **Auto Cleanup** - Automatic data pruning to manage database size
 
