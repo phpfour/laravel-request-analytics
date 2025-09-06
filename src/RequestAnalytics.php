@@ -6,8 +6,6 @@ use MeShaon\RequestAnalytics\Services\RequestAnalyticsService;
 
 class RequestAnalytics
 {
-    public function __construct(private RequestAnalyticsService $requestAnalyticsService) {}
-
     public function getPages() {}
 
     public function getMostVisitedPages() {}

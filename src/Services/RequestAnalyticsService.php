@@ -35,7 +35,7 @@ class RequestAnalyticsService
         return RequestAnalytics::create($requestData);
     }
 
-    private function extractPageTitle(string $content)
+    private function extractPageTitle(string $content): string
     {
         $matches = [];
         preg_match('/<title>(.*?)<\/title>/i', $content, $matches);

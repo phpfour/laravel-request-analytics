@@ -96,31 +96,31 @@ trait CaptureRequest
             // For IPv4, zero out the last octet
             $parts = explode('.', $ip);
             $parts[3] = '0';
-
             return implode('.', $parts);
-        } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        }
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             // For IPv6, zero out the last 80 bits
             $parts = explode(':', $ip);
-            for ($i = 3; $i < count($parts); $i++) {
+            $counter = count($parts);
+            for ($i = 3; $i < $counter; $i++) {
                 $parts[$i] = '0';
             }
-
             return implode(':', $parts);
         }
 
         return $ip;
     }
 
-    protected function parseUserAgent($userAgent)
+    protected function parseUserAgent($userAgent): array
     {
         $operating_system = $this->getOperatingSystem($userAgent);
         $browser = $this->getBrowser($userAgent);
         $device = $this->getDevice($userAgent);
 
-        return compact('operating_system', 'browser', 'device');
+        return ['operating_system' => $operating_system, 'browser' => $browser, 'device' => $device];
     }
 
-    protected function getOperatingSystem($userAgent)
+    protected function getOperatingSystem($userAgent): string
     {
         $operatingSystem = 'Unknown';
         $osRegexes = [
@@ -150,7 +150,7 @@ trait CaptureRequest
         ];
 
         foreach ($osRegexes as $regex => $os) {
-            if (preg_match($regex, $userAgent)) {
+            if (preg_match($regex, (string) $userAgent)) {
                 $operatingSystem = $os;
                 break;
             }
@@ -159,7 +159,7 @@ trait CaptureRequest
         return $operatingSystem;
     }
 
-    protected function getBrowser($userAgent)
+    protected function getBrowser($userAgent): string
     {
         $browser = 'Unknown';
         $browserRegexes = [
@@ -174,7 +174,7 @@ trait CaptureRequest
         ];
 
         foreach ($browserRegexes as $regex => $br) {
-            if (preg_match($regex, $userAgent)) {
+            if (preg_match($regex, (string) $userAgent)) {
                 $browser = $br;
                 break;
             }
@@ -183,7 +183,7 @@ trait CaptureRequest
         return $browser;
     }
 
-    protected function getDevice($userAgent)
+    protected function getDevice($userAgent): string
     {
         $device = 'Unknown';
         $deviceRegexes = [
@@ -198,7 +198,7 @@ trait CaptureRequest
         ];
 
         foreach ($deviceRegexes as $regex => $dev) {
-            if (preg_match($regex, $userAgent)) {
+            if (preg_match($regex, (string) $userAgent)) {
                 $device = $dev;
                 break;
             }

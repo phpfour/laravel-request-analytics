@@ -124,6 +124,6 @@ class BotDetectionService
         ];
 
         return collect($botNames)
-            ->first(fn ($name, $pattern): bool => str_contains($userAgentLower, (string) $pattern));
+            ->first(fn ($name, $pattern): bool => str_contains($userAgentLower, $pattern));
     }
 }

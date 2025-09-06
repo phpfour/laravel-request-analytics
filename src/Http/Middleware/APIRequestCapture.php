@@ -2,6 +2,7 @@
 
 namespace MeShaon\RequestAnalytics\Http\Middleware;
 
+use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,7 +22,7 @@ class APIRequestCapture
     public function terminate(Request $request, Response $response): void
     {
         try {
-            if ($requestData = $this->capture($request, $response, 'api')) {
+            if (($requestData = $this->capture($request, $response, 'api')) instanceof RequestDataDTO) {
                 if (config('request-analytics.queue.enabled', true)) {
                     ProcessData::dispatch($requestData);
                 } else {
