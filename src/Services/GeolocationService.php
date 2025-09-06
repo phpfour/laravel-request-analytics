@@ -7,6 +7,9 @@ use GeoIp2\Exception\AddressNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use MeShaon\RequestAnalytics\Exceptions\GeolocationProviderException;
+use MeShaon\RequestAnalytics\Exceptions\MaxMindConfigurationException;
+use MeShaon\RequestAnalytics\Exceptions\MaxMindDependencyException;
 
 class GeolocationService
 {
@@ -76,6 +79,8 @@ class GeolocationService
                 'ip' => $ip,
                 'error' => $e->getMessage(),
             ]);
+
+            throw new GeolocationProviderException('ipapi', $ip, $e->getMessage(), $e->getCode(), $e);
         }
 
         return $this->getDefaultLocation();
@@ -114,6 +119,8 @@ class GeolocationService
                 'provider' => 'ipgeolocation',
                 'error' => $e->getMessage(),
             ]);
+
+            throw new GeolocationProviderException('ipgeolocation', $ip, $e->getMessage(), $e->getCode(), $e);
         }
 
         return $this->getDefaultLocation();
@@ -138,7 +145,10 @@ class GeolocationService
         if (! $userId || ! $licenseKey) {
             Log::warning('MaxMind web service credentials not configured');
 
-            return $this->getDefaultLocation();
+            throw new MaxMindConfigurationException(
+                'webservice',
+                'MaxMind web service requires both user_id and license_key to be configured'
+            );
         }
 
         try {
@@ -177,6 +187,8 @@ class GeolocationService
                 'ip' => $ip,
                 'error' => $e->getMessage(),
             ]);
+
+            throw new GeolocationProviderException('maxmind-webservice', $ip, $e->getMessage(), $e->getCode(), $e);
         }
 
         return $this->getDefaultLocation();
@@ -191,14 +203,20 @@ class GeolocationService
                 'path' => $databasePath,
             ]);
 
-            return $this->getDefaultLocation();
+            throw new MaxMindConfigurationException(
+                'database',
+                "MaxMind database file not found at path: {$databasePath}"
+            );
         }
 
         // Check if GeoIP2 library is available
         if (! class_exists('GeoIp2\Database\Reader')) {
             Log::warning('GeoIP2 library not installed. Please run: composer require geoip2/geoip2');
 
-            return $this->getDefaultLocation();
+            throw new MaxMindDependencyException(
+                'geoip2/geoip2',
+                'GeoIP2 library not installed. Please run: composer require geoip2/geoip2'
+            );
         }
 
         try {
@@ -225,9 +243,9 @@ class GeolocationService
                 'database' => $databasePath,
                 'error' => $e->getMessage(),
             ]);
-        }
 
-        return $this->getDefaultLocation();
+            throw new GeolocationProviderException('maxmind-database', $ip, $e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     protected function isLocalIp(string $ip): bool

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use MeShaon\RequestAnalytics\Exceptions\MaxMindConfigurationException;
+use MeShaon\RequestAnalytics\Exceptions\MaxMindDependencyException;
 use MeShaon\RequestAnalytics\Services\GeolocationService;
 
 beforeEach(function (): void {
@@ -43,7 +45,7 @@ it('detects various local IP ranges', function (): void {
     }
 });
 
-it('handles MaxMind web service configuration validation', function (): void {
+it('throws exception for MaxMind web service configuration validation', function (): void {
     Config::set('request-analytics.geolocation.provider', 'maxmind');
     Config::set('request-analytics.geolocation.maxmind.type', 'webservice');
     Config::set('request-analytics.geolocation.maxmind.user_id', null);
@@ -54,21 +56,12 @@ it('handles MaxMind web service configuration validation', function (): void {
         ->with('MaxMind web service credentials not configured');
 
     $service = new GeolocationService;
-    $result = $service->lookup('8.8.8.8');
 
-    expect($result)->toBe([
-        'country' => '',
-        'country_code' => '',
-        'region' => '',
-        'city' => '',
-        'latitude' => null,
-        'longitude' => null,
-        'timezone' => '',
-        'isp' => '',
-    ]);
+    expect(fn (): array => $service->lookup('8.8.8.8'))
+        ->toThrow(MaxMindConfigurationException::class, 'MaxMind web service requires both user_id and license_key to be configured');
 });
 
-it('handles MaxMind database when file does not exist', function (): void {
+it('throws exception when MaxMind database file does not exist', function (): void {
     Config::set('request-analytics.geolocation.provider', 'maxmind');
     Config::set('request-analytics.geolocation.maxmind.type', 'database');
     Config::set('request-analytics.geolocation.maxmind.database_path', '/nonexistent/path.mmdb');
@@ -78,21 +71,12 @@ it('handles MaxMind database when file does not exist', function (): void {
         ->with('MaxMind database file not found', ['path' => '/nonexistent/path.mmdb']);
 
     $service = new GeolocationService;
-    $result = $service->lookup('8.8.8.8');
 
-    expect($result)->toBe([
-        'country' => '',
-        'country_code' => '',
-        'region' => '',
-        'city' => '',
-        'latitude' => null,
-        'longitude' => null,
-        'timezone' => '',
-        'isp' => '',
-    ]);
+    expect(fn (): array => $service->lookup('8.8.8.8'))
+        ->toThrow(MaxMindConfigurationException::class, 'MaxMind database file not found at path: /nonexistent/path.mmdb');
 });
 
-it('handles MaxMind database when GeoIP2 library is not installed', function (): void {
+it('throws exception when GeoIP2 library is not installed', function (): void {
     Config::set('request-analytics.geolocation.provider', 'maxmind');
     Config::set('request-analytics.geolocation.maxmind.type', 'database');
 
@@ -105,26 +89,17 @@ it('handles MaxMind database when GeoIP2 library is not installed', function ():
         ->with('GeoIP2 library not installed. Please run: composer require geoip2/geoip2');
 
     $service = new GeolocationService;
-    $result = $service->lookup('8.8.8.8');
 
-    expect($result)->toBe([
-        'country' => '',
-        'country_code' => '',
-        'region' => '',
-        'city' => '',
-        'latitude' => null,
-        'longitude' => null,
-        'timezone' => '',
-        'isp' => '',
-    ]);
+    expect(fn (): array => $service->lookup('8.8.8.8'))
+        ->toThrow(MaxMindDependencyException::class, 'GeoIP2 library not installed. Please run: composer require geoip2/geoip2');
 
     unlink($tempFile);
 });
 
-it('uses correct MaxMind configuration types', function (): void {
+it('handles MaxMind configuration types correctly', function (): void {
     Config::set('request-analytics.geolocation.provider', 'maxmind');
 
-    // Test webservice type
+    // Test webservice type throws exception for missing credentials
     Config::set('request-analytics.geolocation.maxmind.type', 'webservice');
     Config::set('request-analytics.geolocation.maxmind.user_id', null);
 
@@ -133,8 +108,9 @@ it('uses correct MaxMind configuration types', function (): void {
         ->with('MaxMind web service credentials not configured');
 
     $service = new GeolocationService;
-    $result = $service->lookup('8.8.8.8');
-    expect($result['country'])->toBe('');
+
+    expect(fn (): array => $service->lookup('8.8.8.8'))
+        ->toThrow(MaxMindConfigurationException::class);
 });
 
 it('handles MaxMind database type configuration', function (): void {
@@ -147,8 +123,9 @@ it('handles MaxMind database type configuration', function (): void {
         ->with('MaxMind database file not found', ['path' => '/nonexistent/path.mmdb']);
 
     $service = new GeolocationService;
-    $result = $service->lookup('8.8.8.8');
-    expect($result['country'])->toBe('');
+
+    expect(fn (): array => $service->lookup('8.8.8.8'))
+        ->toThrow(MaxMindConfigurationException::class);
 });
 
 it('handles unknown MaxMind type gracefully', function (): void {

@@ -3,6 +3,7 @@
 namespace MeShaon\RequestAnalytics\Services;
 
 use Illuminate\Support\Facades\Auth;
+use MeShaon\RequestAnalytics\Exceptions\RequestAnalyticsStorageException;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
 
@@ -32,7 +33,16 @@ class RequestAnalyticsService
             'visited_at' => now(),
         ];
 
-        return RequestAnalytics::create($requestData);
+        try {
+            return RequestAnalytics::create($requestData);
+        } catch (\Exception $e) {
+            throw new RequestAnalyticsStorageException(
+                $requestData,
+                'Failed to store request analytics data: '.$e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     private function extractPageTitle(string $content): string

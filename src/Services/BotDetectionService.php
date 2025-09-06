@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MeShaon\RequestAnalytics\Services;
 
+use MeShaon\RequestAnalytics\Exceptions\BotDetectionException;
+
 class BotDetectionService
 {
     protected array $botPatterns = [
@@ -85,12 +87,21 @@ class BotDetectionService
         }
 
         [$subnet, $bits] = explode('/', $range);
-        $ip = ip2long($ip);
-        $subnet = ip2long($subnet);
-        $mask = -1 << (32 - $bits);
-        $subnet &= $mask;
+        $ipLong = ip2long($ip);
+        $subnetLong = ip2long($subnet);
 
-        return ($ip & $mask) === $subnet;
+        if ($ipLong === false || $subnetLong === false) {
+            throw new BotDetectionException(
+                null,
+                $ip,
+                "Invalid IP address format during bot detection: IP={$ip}, Range={$range}"
+            );
+        }
+
+        $mask = -1 << (32 - $bits);
+        $subnetLong &= $mask;
+
+        return ($ipLong & $mask) === $subnetLong;
     }
 
     public function getBotName(?string $userAgent): ?string
