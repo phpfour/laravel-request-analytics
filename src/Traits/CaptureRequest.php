@@ -213,7 +213,22 @@ trait CaptureRequest
     {
         $ignorePaths = array_merge(config('request-analytics.ignore-paths'), [config('request-analytics.route.pathname')]);
 
-        return in_array($path, $ignorePaths);
+        foreach ($ignorePaths as $ignorePath) {
+            // Handle exact matches
+            if ($path === $ignorePath) {
+                return true;
+            }
+
+            // Handle wildcard patterns
+            if (str_contains((string) $ignorePath, '*')) {
+                $pattern = str_replace('*', '.*', preg_quote((string) $ignorePath, '/'));
+                if (preg_match('/^'.$pattern.'$/', $path)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     protected function isBot(Request $request): bool
