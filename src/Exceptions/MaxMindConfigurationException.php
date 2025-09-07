@@ -10,7 +10,7 @@ class MaxMindConfigurationException extends GeolocationException
     public function __construct(
         protected string $configurationType,
         string $message = '',
-        int $code = 0,
+        int|string $code = 0,
         ?\Throwable $previous = null
     ) {
         $message = $message ?: "MaxMind {$this->configurationType} configuration is invalid or missing";

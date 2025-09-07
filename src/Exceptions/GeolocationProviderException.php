@@ -11,7 +11,7 @@ class GeolocationProviderException extends GeolocationException
         protected string $provider,
         protected string $ipAddress,
         string $message = '',
-        int $code = 0,
+        int|string $code = 0,
         ?\Throwable $previous = null
     ) {
         $message = $message ?: "Geolocation lookup failed for IP {$this->ipAddress} using provider {$this->provider}";

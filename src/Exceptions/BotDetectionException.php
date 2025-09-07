@@ -11,7 +11,7 @@ class BotDetectionException extends RequestAnalyticsException
         protected ?string $userAgent = null,
         protected ?string $ipAddress = null,
         string $message = '',
-        int $code = 0,
+        int|string $code = 0,
         ?\Throwable $previous = null
     ) {
         $message = $message ?: 'Bot detection failed';
