@@ -311,7 +311,7 @@ class AnalyticsService
     {
         $dateRange = $this->getDateRange($params);
         $query = $this->getBaseQuery($dateRange);
-        $withPercentages = (bool) $params['with_percentages'] ?? false;
+        $withPercentages = (bool) ($params['with_percentages'] ?? false);
 
         return [
             'summary' => $this->getSummary($query),
