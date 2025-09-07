@@ -18,7 +18,13 @@ class RequestAnalyticsController extends BaseController
         $dateRange = is_numeric($dateRangeInput) && (int) $dateRangeInput > 0
             ? (int) $dateRangeInput
             : 30;
+
+        $requestCategory = $request->input('request_category');
+
         $this->dashboardService->setDateRange($dateRange);
+        if ($requestCategory) {
+            $this->dashboardService->setRequestCategory($requestCategory);
+        }
 
         $data = $this->dashboardService->getDashboardData();
 

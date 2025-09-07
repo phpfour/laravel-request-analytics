@@ -96,4 +96,31 @@ class DashboardTest extends BaseFeatureTestCase
             $response->assertOk();
         }
     }
+
+    #[Test]
+    public function it_filters_by_request_category(): void
+    {
+        RequestAnalytics::factory()->count(10)->create(['request_category' => 'web']);
+        RequestAnalytics::factory()->count(5)->create(['request_category' => 'api']);
+
+        $response = $this->get(route('request-analytics.dashboard', ['request_category' => 'web']));
+        $response->assertOk()->assertViewIs('request-analytics::analytics');
+
+        $response = $this->get(route('request-analytics.dashboard', ['request_category' => 'api']));
+        $response->assertOk()->assertViewIs('request-analytics::analytics');
+    }
+
+    #[Test]
+    public function it_handles_combined_date_range_and_request_category_filters(): void
+    {
+        RequestAnalytics::factory()->count(8)->create(['request_category' => 'web']);
+        RequestAnalytics::factory()->count(3)->create(['request_category' => 'api']);
+
+        $response = $this->get(route('request-analytics.dashboard', [
+            'date_range' => 7,
+            'request_category' => 'web',
+        ]));
+
+        $response->assertOk()->assertViewIs('request-analytics::analytics');
+    }
 }

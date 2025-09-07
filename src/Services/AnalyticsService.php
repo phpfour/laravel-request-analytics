@@ -32,9 +32,15 @@ class AnalyticsService
         ];
     }
 
-    public function getBaseQuery(array $dateRange): Builder
+    public function getBaseQuery(array $dateRange, ?string $requestCategory = null): Builder
     {
-        return RequestAnalytics::whereBetween('visited_at', [$dateRange['start'], $dateRange['end']]);
+        $query = RequestAnalytics::whereBetween('visited_at', [$dateRange['start'], $dateRange['end']]);
+
+        if ($requestCategory) {
+            $query->where('request_category', $requestCategory);
+        }
+
+        return $query;
     }
 
     public function getSummary($query): array
@@ -310,7 +316,8 @@ class AnalyticsService
     public function getOverviewData(array $params): array
     {
         $dateRange = $this->getDateRange($params);
-        $query = $this->getBaseQuery($dateRange);
+        $requestCategory = $params['request_category'] ?? null;
+        $query = $this->getBaseQuery($dateRange, $requestCategory);
         $withPercentages = (bool) ($params['with_percentages'] ?? false);
 
         return [
@@ -328,8 +335,9 @@ class AnalyticsService
     public function getVisitors(array $params, int $perPage = 50)
     {
         $dateRange = $this->getDateRange($params);
+        $requestCategory = $params['request_category'] ?? null;
 
-        return $this->getBaseQuery($dateRange)
+        return $this->getBaseQuery($dateRange, $requestCategory)
             ->select(
                 'visitor_id',
                 DB::raw('COUNT(*) as page_views'),
@@ -347,7 +355,8 @@ class AnalyticsService
     public function getPageViews(array $params, int $perPage = 50)
     {
         $dateRange = $this->getDateRange($params);
-        $query = $this->getBaseQuery($dateRange);
+        $requestCategory = $params['request_category'] ?? null;
+        $query = $this->getBaseQuery($dateRange, $requestCategory);
 
         if (isset($params['path'])) {
             $query->where('path', 'like', "%{$params['path']}%");

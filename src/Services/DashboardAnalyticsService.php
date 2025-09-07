@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace MeShaon\RequestAnalytics\Services;
 
+use Illuminate\Database\Eloquent\Builder;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardAnalyticsService
 {
-    public function __construct(protected AnalyticsService $analyticsService, protected int $dateRange = 30) {}
+    public function __construct(protected AnalyticsService $analyticsService, protected int $dateRange = 30, protected ?string $requestCategory = null) {}
 
     public function setDateRange(int $dateRange): self
     {
@@ -19,16 +20,25 @@ class DashboardAnalyticsService
         return $this;
     }
 
+    public function setRequestCategory(?string $requestCategory): self
+    {
+        $this->requestCategory = $requestCategory;
+
+        return $this;
+    }
+
     public function getDashboardData(): array
     {
         $dateRange = $this->getDateRange();
-        $query = $this->analyticsService->getBaseQuery($dateRange);
+        $query = $this->getBaseQuery($dateRange);
         $cacheTtl = config('request-analytics.cache.ttl', 5);
+
+        $cacheKeySuffix = $this->requestCategory ? "_{$this->requestCategory}" : '';
 
         $chartData = $this->getChartData();
 
         return [
-            'browsers' => $this->analyticsService->getBrowsers($query, true, "analytics_browsers_{$this->dateRange}", $cacheTtl),
+            'browsers' => $this->analyticsService->getBrowsers($query, true, "analytics_browsers_{$this->dateRange}{$cacheKeySuffix}", $cacheTtl),
             'operatingSystems' => $this->analyticsService->getOperatingSystems($query, true),
             'devices' => $this->analyticsService->getDevices($query, true),
             'pages' => $this->analyticsService->getTopPages($query, true),
@@ -36,7 +46,7 @@ class DashboardAnalyticsService
             'labels' => $chartData['labels'],
             'datasets' => $chartData['datasets'],
             'average' => $this->getAverage(),
-            'countries' => $this->analyticsService->getCountries($query, true, "analytics_countries_{$this->dateRange}", $cacheTtl),
+            'countries' => $this->analyticsService->getCountries($query, true, "analytics_countries_{$this->dateRange}{$cacheKeySuffix}", $cacheTtl),
             'dateRange' => $this->dateRange,
         ];
     }
@@ -49,10 +59,15 @@ class DashboardAnalyticsService
         ];
     }
 
+    protected function getBaseQuery(array $dateRange): Builder
+    {
+        return $this->analyticsService->getBaseQuery($dateRange, $this->requestCategory);
+    }
+
     protected function getChartData(): array
     {
         $dateRange = $this->getDateRange();
-        $query = $this->analyticsService->getBaseQuery($dateRange);
+        $query = $this->getBaseQuery($dateRange);
         $chartData = $this->analyticsService->getChartData($query, $dateRange);
 
         // Add dashboard-specific styling
@@ -82,7 +97,7 @@ class DashboardAnalyticsService
     {
         $dateRange = $this->getDateRange();
         $startDate = $dateRange['start'];
-        $baseQuery = $this->analyticsService->getBaseQuery($dateRange);
+        $baseQuery = $this->getBaseQuery($dateRange);
 
         $totalViews = $baseQuery->count();
         $uniqueVisitors = $baseQuery->distinct('session_id')->count('session_id');
@@ -94,8 +109,13 @@ class DashboardAnalyticsService
         $sessionsWithSinglePageView = DB::connection($connection)->table(function ($query) use ($startDate, $tableName): void {
             $query->from($tableName)
                 ->select('session_id')
-                ->where('visited_at', '>=', $startDate)
-                ->groupBy('session_id')
+                ->where('visited_at', '>=', $startDate);
+
+            if ($this->requestCategory) {
+                $query->where('request_category', $this->requestCategory);
+            }
+
+            $query->groupBy('session_id')
                 ->havingRaw('COUNT(*) = 1');
         }, 'single_page_sessions')->count();
 

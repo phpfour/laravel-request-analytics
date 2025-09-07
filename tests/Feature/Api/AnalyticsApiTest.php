@@ -252,4 +252,55 @@ class AnalyticsApiTest extends BaseFeatureTestCase
 
         $this->assertEquals($response1->json(), $response2->json());
     }
+
+    #[Test]
+    public function it_filters_overview_data_by_request_category(): void
+    {
+        RequestAnalytics::factory()->count(15)->create(['request_category' => 'web']);
+        RequestAnalytics::factory()->count(8)->create(['request_category' => 'api']);
+
+        $response = $this->getJson(route('request-analytics.api.overview', ['request_category' => 'web']));
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'summary',
+                    'chart',
+                    'top_pages',
+                    'top_referrers',
+                    'browsers',
+                    'operating_systems',
+                    'devices',
+                    'countries',
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function it_filters_visitors_by_request_category(): void
+    {
+        RequestAnalytics::factory()->count(12)->create(['request_category' => 'web']);
+        RequestAnalytics::factory()->count(6)->create(['request_category' => 'api']);
+
+        $response = $this->getJson(route('request-analytics.api.visitors', ['request_category' => 'api']));
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data',
+            ]);
+    }
+
+    #[Test]
+    public function it_filters_page_views_by_request_category(): void
+    {
+        RequestAnalytics::factory()->count(18)->create(['request_category' => 'web']);
+        RequestAnalytics::factory()->count(9)->create(['request_category' => 'api']);
+
+        $response = $this->getJson(route('request-analytics.api.page-views', ['request_category' => 'web']));
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data',
+            ]);
+    }
 }
