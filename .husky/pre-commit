@@ -1,0 +1,46 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Get staged PHP files (exclude deleted files)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep -E '\.php$' || true)
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "No staged PHP files to process. Skipping quality checks."
+    exit 0
+fi
+
+# Filter out files that don't exist (in case of race conditions)
+EXISTING_FILES=""
+for file in $STAGED_FILES; do
+    if [ -f "$file" ]; then
+        EXISTING_FILES="$EXISTING_FILES $file"
+    fi
+done
+
+# Trim leading whitespace
+EXISTING_FILES=$(echo "$EXISTING_FILES" | sed 's/^ *//')
+
+if [ -z "$EXISTING_FILES" ]; then
+    echo "No existing PHP files to process. Skipping quality checks."
+    exit 0
+fi
+
+echo "Running Pint on staged files..."
+if ! ./vendor/bin/pint $EXISTING_FILES; then
+    echo "Pint failed"
+    exit 1
+fi
+
+# Add formatted files back to staging
+git add $EXISTING_FILES
+
+echo "Running Rector on staged files..."
+if ! ./vendor/bin/rector process $EXISTING_FILES; then
+    echo "Rector failed" 
+    exit 1
+fi
+
+# Add any files that Rector may have modified back to staging
+git add $EXISTING_FILES
+
+echo "All checks and fixes completed!"

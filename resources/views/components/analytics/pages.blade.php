@@ -6,7 +6,7 @@
     @forelse($pages as $page)
         <x-request-analytics::stats.item
             label="{{ $page['path'] }}"
-            count="{{ $page['visitorCount'] }}"
+            count="{{ $page['views'] }}"
             percentage="{{ $page['percentage'] }}"
         />
     @empty

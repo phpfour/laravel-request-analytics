@@ -3,6 +3,7 @@
 namespace MeShaon\RequestAnalytics\Services;
 
 use Illuminate\Support\Facades\Auth;
+use MeShaon\RequestAnalytics\Exceptions\RequestAnalyticsStorageException;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
 
@@ -20,21 +21,31 @@ class RequestAnalyticsService
             'screen' => '',
             'referrer' => $requestDataDTO->referrer,
             'country' => $requestDataDTO->country,
-            'city' => '',
+            'city' => $requestDataDTO->city,
             'language' => $requestDataDTO->language,
             'query_params' => $requestDataDTO->queryParams,
-            'session_id' => session()->getId(),
+            'session_id' => $requestDataDTO->sessionId ?: session()->getId(),
+            'visitor_id' => $requestDataDTO->visitorId,
             'user_id' => Auth::id(),
             'http_method' => $requestDataDTO->httpMethod,
             'request_category' => $requestDataDTO->requestCategory,
-            'response_time' => $requestDataDTO->responseTime,
+            'response_time' => round($requestDataDTO->responseTime * 1000), // Convert to milliseconds
             'visited_at' => now(),
         ];
 
-        return RequestAnalytics::create($requestData);
+        try {
+            return RequestAnalytics::create($requestData);
+        } catch (\Exception $e) {
+            throw new RequestAnalyticsStorageException(
+                $requestData,
+                'Failed to store request analytics data: '.$e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
-    private function extractPageTitle(string $content)
+    private function extractPageTitle(string $content): string
     {
         $matches = [];
         preg_match('/<title>(.*?)<\/title>/i', $content, $matches);

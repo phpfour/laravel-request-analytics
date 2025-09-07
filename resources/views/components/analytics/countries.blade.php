@@ -7,7 +7,7 @@
     @forelse($countries as $country)
         <x-request-analytics::stats.item
                 label="{{ $country['name'] }}"
-                count="{{ $country['visitorCount'] }}"
+                count="{{ $country['count'] }}"
                 percentage="{{ $country['percentage'] }}"
                 imgSrc="https://www.worldatlas.com/r/w236/img/flag/{{$country['code']}}-flag.jpg"
         />
