@@ -62,11 +62,20 @@ class AnalyticsService
     {
         $dateExpression = $this->getDateExpression('visited_at');
 
+        // Check if we should use session_id instead of visitor_id for counting
+        $totalRecords = (clone $query)->count();
+        $validVisitorIds = (clone $query)->whereNotNull('visitor_id')->where('visitor_id', '!=', '')->count();
+        $useSessionId = $totalRecords > 0 && ($validVisitorIds / $totalRecords) < 0.5;
+
+        $visitorCountExpression = $useSessionId
+            ? 'COUNT(DISTINCT session_id) as visitors'
+            : 'COUNT(DISTINCT visitor_id) as visitors';
+
         $data = (clone $query)
             ->select(
                 DB::raw("{$dateExpression} as date"),
                 DB::raw('COUNT(*) as views'),
-                DB::raw('COUNT(DISTINCT visitor_id) as visitors')
+                DB::raw($visitorCountExpression)
             )
             ->groupBy(DB::raw($dateExpression))
             ->orderBy('date')
