@@ -211,18 +211,32 @@ trait CaptureRequest
 
     protected function shouldIgnore(string $path): bool
     {
-        $ignorePaths = array_merge(config('request-analytics.ignore-paths'), [config('request-analytics.route.pathname')]);
+        $ignorePaths = array_merge(config('request-analytics.ignore-paths', []), [config('request-analytics.route.pathname')]);
+
+        // Normalize the path by removing leading slash if present
+        $normalizedPath = ltrim($path, '/');
 
         foreach ($ignorePaths as $ignorePath) {
+            // Skip empty ignore paths
+            if (empty($ignorePath)) {
+                continue;
+            }
+
+            // Normalize the ignore path by removing leading slash if present
+            $normalizedIgnorePath = ltrim((string) $ignorePath, '/');
+
             // Handle exact matches
-            if ($path === $ignorePath) {
+            if ($normalizedPath === $normalizedIgnorePath) {
                 return true;
             }
 
             // Handle wildcard patterns
-            if (str_contains((string) $ignorePath, '*')) {
-                $pattern = str_replace('*', '.*', preg_quote((string) $ignorePath, '/'));
-                if (preg_match('/^'.$pattern.'$/', $path)) {
+            if (str_contains($normalizedIgnorePath, '*')) {
+                // Convert wildcard pattern to regex pattern
+                // First escape special regex chars, then replace \* with .*
+                $pattern = preg_quote($normalizedIgnorePath, '#');
+                $pattern = str_replace('\\*', '.*', $pattern);
+                if (preg_match('#^'.$pattern.'$#', $normalizedPath)) {
                     return true;
                 }
             }

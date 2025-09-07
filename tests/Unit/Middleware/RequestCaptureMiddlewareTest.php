@@ -186,6 +186,142 @@ class RequestCaptureMiddlewareTest extends TestCase
     }
 
     #[Test]
+    public function middleware_does_not_capture_wildcard_ignored_paths(): void
+    {
+        Queue::fake();
+
+        config([
+            'request-analytics.privacy.respect_dnt' => false,
+            'request-analytics.capture.bots' => true,
+            'request-analytics.ignore-paths' => ['api/admin/*'],
+            'request-analytics.route.pathname' => '/analytics',
+        ]);
+
+        $middleware = new APIRequestCapture;
+        $request = Request::create('/api/admin/users', 'GET');
+        $request->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response = new Response('API Response');
+
+        $middleware->terminate($request, $response);
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
+    public function middleware_does_not_capture_nested_wildcard_ignored_paths(): void
+    {
+        Queue::fake();
+
+        config([
+            'request-analytics.privacy.respect_dnt' => false,
+            'request-analytics.capture.bots' => true,
+            'request-analytics.ignore-paths' => ['api/*/internal'],
+            'request-analytics.route.pathname' => '/analytics',
+        ]);
+
+        $middleware = new APIRequestCapture;
+        $request = Request::create('/api/v1/internal', 'GET');
+        $request->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response = new Response('API Response');
+
+        $middleware->terminate($request, $response);
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
+    public function middleware_captures_paths_that_do_not_match_wildcard_pattern(): void
+    {
+        Queue::fake();
+
+        config([
+            'request-analytics.privacy.respect_dnt' => false,
+            'request-analytics.capture.bots' => true,
+            'request-analytics.ignore-paths' => ['api/admin/*'],
+            'request-analytics.route.pathname' => '/analytics',
+        ]);
+
+        $middleware = new APIRequestCapture;
+        $request = Request::create('/api/public/users', 'GET');
+        $request->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response = new Response('API Response');
+
+        $middleware->terminate($request, $response);
+
+        Queue::assertPushed(ProcessData::class);
+    }
+
+    #[Test]
+    public function middleware_handles_multiple_wildcard_patterns(): void
+    {
+        Queue::fake();
+
+        config([
+            'request-analytics.privacy.respect_dnt' => false,
+            'request-analytics.capture.bots' => true,
+            'request-analytics.ignore-paths' => ['api/admin/*', 'livewire/*', '_debugbar/*'],
+            'request-analytics.route.pathname' => '/analytics',
+        ]);
+
+        $middleware = new APIRequestCapture;
+
+        // Test first wildcard pattern
+        $request1 = Request::create('/api/admin/dashboard', 'GET');
+        $request1->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response1 = new Response('API Response');
+        $middleware->terminate($request1, $response1);
+
+        // Test second wildcard pattern
+        $request2 = Request::create('/livewire/component', 'GET');
+        $request2->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response2 = new Response('API Response');
+        $middleware->terminate($request2, $response2);
+
+        // Test third wildcard pattern
+        $request3 = Request::create('/_debugbar/assets/js', 'GET');
+        $request3->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response3 = new Response('API Response');
+        $middleware->terminate($request3, $response3);
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
+    public function middleware_handles_mixed_exact_and_wildcard_ignore_paths(): void
+    {
+        Queue::fake();
+
+        config([
+            'request-analytics.privacy.respect_dnt' => false,
+            'request-analytics.capture.bots' => true,
+            'request-analytics.ignore-paths' => ['api/health', 'api/admin/*', 'exact/path'],
+            'request-analytics.route.pathname' => '/analytics',
+        ]);
+
+        $middleware = new APIRequestCapture;
+
+        // Test exact match
+        $request1 = Request::create('/api/health', 'GET');
+        $request1->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response1 = new Response('API Response');
+        $middleware->terminate($request1, $response1);
+
+        // Test wildcard match
+        $request2 = Request::create('/api/admin/settings', 'GET');
+        $request2->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response2 = new Response('API Response');
+        $middleware->terminate($request2, $response2);
+
+        // Test another exact match
+        $request3 = Request::create('/exact/path', 'GET');
+        $request3->headers->set('User-Agent', 'Test Browser Mozilla');
+        $response3 = new Response('API Response');
+        $middleware->terminate($request3, $response3);
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
     public function middleware_logs_errors_when_exception_occurs(): void
     {
         // Just test that middleware doesn't break when errors occur
