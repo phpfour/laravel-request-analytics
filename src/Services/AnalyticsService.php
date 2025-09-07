@@ -17,7 +17,7 @@ class AnalyticsService
         if (isset($params['start_date']) && isset($params['end_date'])) {
             $startDate = Carbon::parse($params['start_date'])->startOfDay();
             $endDate = Carbon::parse($params['end_date'])->endOfDay();
-            $days = $startDate->diffInDays($endDate);
+            $days = (int) $startDate->diffInDays($endDate);
         } else {
             $days = $params['date_range'] ?? 30;
             $startDate = Carbon::now()->subDays($days)->startOfDay();

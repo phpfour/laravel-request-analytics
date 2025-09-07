@@ -113,11 +113,14 @@ class VisitorTrackingServiceTest extends TestCase
 
         // Start session manually for testing
         $this->app['session']->start();
-        $request->setLaravelSession($this->app['session']);
+
+        // Get the actual session store instead of session manager for Laravel 11+ compatibility
+        $sessionStore = $this->app['session']->driver();
+        $request->setLaravelSession($sessionStore);
 
         $result = $this->service->getSessionId($request);
 
-        $this->assertEquals($this->app['session']->getId(), $result);
+        $this->assertEquals($sessionStore->getId(), $result);
     }
 
     #[Test]
