@@ -24,47 +24,47 @@ class CaptureRequestTest extends TestCase
         {
             use CaptureRequest;
 
-            public function test_capture(Request $request, \Symfony\Component\HttpFoundation\Response $response, string $category): ?RequestDataDTO
+            public function testCapture(Request $request, \Symfony\Component\HttpFoundation\Response $response, string $category): ?RequestDataDTO
             {
                 return $this->capture($request, $response, $category);
             }
 
-            public function test_get_ip_address(Request $request): string
+            public function testGetIpAddress(Request $request): string
             {
                 return $this->getIpAddress($request);
             }
 
-            public function test_anonymize_ip(string $ip): string
+            public function testAnonymizeIp(string $ip): string
             {
                 return $this->anonymizeIp($ip);
             }
 
-            public function test_parse_user_agent($userAgent): array
+            public function testParseUserAgent($userAgent): array
             {
                 return $this->parseUserAgent($userAgent);
             }
 
-            public function test_get_operating_system($userAgent): string
+            public function testGetOperatingSystem($userAgent): string
             {
                 return $this->getOperatingSystem($userAgent);
             }
 
-            public function test_get_browser($userAgent): string
+            public function testGetBrowser($userAgent): string
             {
                 return $this->getBrowser($userAgent);
             }
 
-            public function test_get_device($userAgent): string
+            public function testGetDevice($userAgent): string
             {
                 return $this->getDevice($userAgent);
             }
 
-            public function test_should_ignore(string $path): bool
+            public function testShouldIgnore(string $path): bool
             {
                 return $this->shouldIgnore($path);
             }
 
-            public function test_is_bot(Request $request): bool
+            public function testIsBot(Request $request): bool
             {
                 return $this->isBot($request);
             }
