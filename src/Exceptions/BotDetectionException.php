@@ -15,7 +15,7 @@ class BotDetectionException extends RequestAnalyticsException
         ?\Throwable $previous = null
     ) {
         $message = $message ?: 'Bot detection failed';
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, (int) $code, $previous);
     }
 
     public function getUserAgent(): ?string

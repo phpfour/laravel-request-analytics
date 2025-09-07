@@ -14,7 +14,7 @@ class MaxMindConfigurationException extends GeolocationException
         ?\Throwable $previous = null
     ) {
         $message = $message ?: "MaxMind {$this->configurationType} configuration is invalid or missing";
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, (int) $code, $previous);
     }
 
     public function getConfigurationType(): string

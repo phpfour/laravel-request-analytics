@@ -14,7 +14,7 @@ class RequestAnalyticsStorageException extends RequestAnalyticsException
         ?\Throwable $previous = null
     ) {
         $message = $message ?: 'Failed to store request analytics data';
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, (int) $code, $previous);
     }
 
     public function getRequestData(): array

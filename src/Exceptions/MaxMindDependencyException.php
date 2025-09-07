@@ -14,7 +14,7 @@ class MaxMindDependencyException extends GeolocationException
         ?\Throwable $previous = null
     ) {
         $message = $message ?: "Required dependency '{$this->dependency}' is not available. Please install it using composer.";
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, (int) $code, $previous);
     }
 
     public function getDependency(): string
