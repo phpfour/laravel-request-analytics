@@ -70,34 +70,36 @@ class DashboardAnalyticsService
         $query = $this->getBaseQuery($dateRange);
         $chartData = $this->analyticsService->getChartData($query, $dateRange);
 
-        // Add dashboard-specific styling
+        // Add dashboard-specific styling with high contrast colors
         $chartData['datasets'] = collect($chartData['datasets'])->map(function (array $dataset): array {
             if ($dataset['label'] === 'Views') {
                 return array_merge($dataset, [
-                    'backgroundColor' => 'rgba(255, 99, 132, 0.1)',
-                    'borderColor' => 'rgba(255, 99, 132, 1)',
-                    'borderWidth' => 3,
+                    'backgroundColor' => 'rgba(220, 38, 127, 0.1)', // Bright pink background
+                    'borderColor' => 'rgba(220, 38, 127, 1)', // Bright pink border
+                    'borderWidth' => 4,
                     'fill' => false,
-                    'tension' => 0.2,
-                    'pointBackgroundColor' => 'rgba(255, 99, 132, 1)',
+                    'tension' => 0.3,
+                    'pointBackgroundColor' => 'rgba(220, 38, 127, 1)',
                     'pointBorderColor' => '#fff',
-                    'pointBorderWidth' => 2,
-                    'pointRadius' => 5,
-                    'pointHoverRadius' => 7,
+                    'pointBorderWidth' => 3,
+                    'pointRadius' => 6,
+                    'pointHoverRadius' => 8,
+                    'borderDash' => [], // Solid line
                 ]);
             }
             if ($dataset['label'] === 'Visitors') {
                 return array_merge($dataset, [
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.1)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'borderWidth' => 3,
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)', // Bright green background
+                    'borderColor' => 'rgba(34, 197, 94, 1)', // Bright green border
+                    'borderWidth' => 4,
                     'fill' => false,
-                    'tension' => 0.2,
-                    'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                    'tension' => 0.3,
+                    'pointBackgroundColor' => 'rgba(34, 197, 94, 1)',
                     'pointBorderColor' => '#fff',
-                    'pointBorderWidth' => 2,
-                    'pointRadius' => 5,
-                    'pointHoverRadius' => 7,
+                    'pointBorderWidth' => 3,
+                    'pointRadius' => 6,
+                    'pointHoverRadius' => 8,
+                    'borderDash' => [10, 5], // Dashed line to differentiate
                 ]);
             }
 

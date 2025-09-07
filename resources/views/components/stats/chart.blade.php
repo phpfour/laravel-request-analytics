@@ -29,9 +29,17 @@
                         position: 'top',
                         labels: {
                             usePointStyle: true,
+                            pointStyle: 'line',
                             padding: 20,
                             font: {
-                                size: 12
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            generateLabels: function(chart) {
+                                return Chart.defaults.plugins.legend.labels.generateLabels(chart).map(function(label) {
+                                    label.lineWidth = 4;
+                                    return label;
+                                });
                             }
                         }
                     }
@@ -47,7 +55,9 @@
                             font: {
                                 size: 11
                             },
-                            color: '#6b7280'
+                            color: '#6b7280',
+                            precision: 0,
+                            stepSize: 1
                         }
                     },
                     x: {
@@ -69,10 +79,19 @@
                 elements: {
                     point: {
                         radius: 4,
-                        hoverRadius: 6
+                        hoverRadius: 6,
+                        pointStyle: 'circle'
                     },
                     line: {
-                        tension: 0.1
+                        tension: 0.3
+                    }
+                },
+                datasets: {
+                    line: {
+                        pointStyle: 'circle',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 3
                     }
                 }
             }
