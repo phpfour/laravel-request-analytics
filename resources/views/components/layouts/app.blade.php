@@ -22,15 +22,27 @@
         tailwind.config = {
             theme: {
                 container: {
-                    center: true
-                }
+                    center: true,
+                    padding: {
+                        DEFAULT: '1rem',
+                        sm: '2rem',
+                        lg: '4rem',
+                        xl: '5rem',
+                        '2xl': '6rem',
+                    },
+                },
             }
         }
     </script>
 </head>
-<body>
-<header class="container flex items-center justify-between py-5">
-    <h4 class="font-bold text-2xl">{{ config('app.name') }}'s Request Analytics</h4>
+<body class="bg-gray-50 min-h-screen">
+<header class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="container flex items-center justify-between py-6">
+        <div>
+            <h4 class="font-semibold text-xl text-gray-900">{{ config('app.name') }}</h4>
+            <p class="text-sm text-gray-500 mt-1">Request Analytics</p>
+        </div>
+    </div>
 </header>
 {{$slot}}
 @stack('scripts')

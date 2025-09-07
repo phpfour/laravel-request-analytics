@@ -6,8 +6,8 @@
     'width' => 500,
 ])
 
-<div>
-    <canvas id="stats-chart" width="{{ $width }}" height="{{ $height }}"></canvas>
+<div class="relative">
+    <canvas id="stats-chart" class="w-full" style="max-height: 400px;"></canvas>
 </div>
 
 @push('scripts')
@@ -21,9 +21,58 @@
                 datasets: @js($datasets)
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
                 scales: {
                     y: {
-                        beginAtZero: false
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6',
+                            borderDash: [2, 2]
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            },
+                            color: '#6b7280'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            },
+                            color: '#6b7280'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    },
+                    line: {
+                        tension: 0.1
                     }
                 }
             }
