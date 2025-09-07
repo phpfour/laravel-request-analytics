@@ -9,7 +9,7 @@
                 'chrome' =>  asset('browsers/chrome.png'),
                 'firefox' => asset('browsers/firefox.png'),
                 'safari' => asset('browsers/safari.png'),
-                'edge' => asset('browsers/microsoft-edge.png'),
+                'edge' => asset('browsers/ms-edge.png'),
                 default => asset('browsers/unknown.png'),
             };
         }
