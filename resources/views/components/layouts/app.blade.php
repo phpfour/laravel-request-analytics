@@ -36,14 +36,6 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-<header class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="container flex items-center justify-between py-6">
-        <div>
-            <h4 class="font-semibold text-xl text-gray-900">{{ config('app.name') }}</h4>
-            <p class="text-sm text-gray-500 mt-1">Request Analytics</p>
-        </div>
-    </div>
-</header>
 {{$slot}}
 @stack('scripts')
 </body>

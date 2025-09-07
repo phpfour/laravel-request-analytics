@@ -8,7 +8,7 @@
             </div>
             <div class="w-full sm:w-auto">
                 <form method="GET" action="{{ route(config('request-analytics.route.name')) }}" class="flex items-center gap-2">
-                    <select name="date_range" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select name="date_range" class="bg-white border border-gray-300 rounded-lg px-3 py-2.5 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-10">
                         <option value="7" {{ $dateRange == 7 ? 'selected' : '' }}>Last 7 days</option>
                         <option value="30" {{ $dateRange == 30 ? 'selected' : '' }}>Last 30 days</option>
                         <option value="90" {{ $dateRange == 90 ? 'selected' : '' }}>Last 90 days</option>
