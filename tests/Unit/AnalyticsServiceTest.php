@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MeShaon\RequestAnalytics\Tests\Unit;
 
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use MeShaon\RequestAnalytics\Models\RequestAnalytics;
 use MeShaon\RequestAnalytics\Services\AnalyticsService;

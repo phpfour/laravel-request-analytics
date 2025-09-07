@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MeShaon\RequestAnalytics\Tests\Unit\Middleware;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use MeShaon\RequestAnalytics\Contracts\CanAccessAnalyticsDashboard;
@@ -12,6 +11,7 @@ use MeShaon\RequestAnalytics\Http\Middleware\AnalyticsDashboardMiddleware;
 use MeShaon\RequestAnalytics\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AnalyticsDashboardMiddlewareTest extends TestCase
 {
@@ -29,7 +29,7 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
         $request = Request::create('/api/analytics');
         $request->headers->set('Accept', 'application/json');
 
-        $next = fn($req): Response => new Response('Should not reach here');
+        $next = fn ($req): Response => new Response('Should not reach here');
 
         $response = $this->middleware->handle($request, $next);
 
@@ -43,7 +43,7 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
     {
         $request = Request::create('/analytics');
 
-        $next = fn($req): Response => new Response('Should not reach here');
+        $next = fn ($req): Response => new Response('Should not reach here');
 
         $this->expectException(HttpException::class);
 
@@ -56,9 +56,9 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
         $user = Mockery::mock();
         $request = Request::create('/api/analytics');
         $request->headers->set('Accept', 'application/json');
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
-        $next = fn($req): Response => new Response('Should not reach here');
+        $next = fn ($req): Response => new Response('Should not reach here');
 
         $response = $this->middleware->handle($request, $next);
 
@@ -72,9 +72,9 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
     {
         $user = Mockery::mock();
         $request = Request::create('/analytics');
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
-        $next = fn($req): Response => new Response('Should not reach here');
+        $next = fn ($req): Response => new Response('Should not reach here');
 
         $this->expectException(HttpException::class);
 
@@ -89,9 +89,9 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
 
         $request = Request::create('/api/analytics');
         $request->headers->set('Accept', 'application/json');
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
-        $next = fn($req): Response => new Response('Should not reach here');
+        $next = fn ($req): Response => new Response('Should not reach here');
 
         $response = $this->middleware->handle($request, $next);
 
@@ -107,9 +107,9 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
         $user->shouldReceive('canAccessAnalyticsDashboard')->andReturn(false);
 
         $request = Request::create('/analytics');
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
-        $next = fn($req): Response => new Response('Should not reach here');
+        $next = fn ($req): Response => new Response('Should not reach here');
 
         $this->expectException(HttpException::class);
 
@@ -123,9 +123,9 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
         $user->shouldReceive('canAccessAnalyticsDashboard')->andReturn(true);
 
         $request = Request::create('/analytics');
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
-        $next = fn($req): Response => new Response('Dashboard content');
+        $next = fn ($req): Response => new Response('Dashboard content');
 
         $response = $this->middleware->handle($request, $next);
 
@@ -141,9 +141,9 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
 
         $request = Request::create('/api/analytics');
         $request->headers->set('Accept', 'application/json');
-        $request->setUserResolver(fn() => $user);
+        $request->setUserResolver(fn () => $user);
 
-        $next = fn($req): Response => new Response('{"data": "success"}');
+        $next = fn ($req): Response => new Response('{"data": "success"}');
 
         $response = $this->middleware->handle($request, $next);
 

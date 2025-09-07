@@ -21,7 +21,7 @@ class RequestCaptureMiddlewareTest extends TestCase
         $middleware = new APIRequestCapture;
         $request = Request::create('/api/test', 'GET');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('API Response'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('API Response'));
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('API Response', $response->getContent());
@@ -33,7 +33,7 @@ class RequestCaptureMiddlewareTest extends TestCase
         $middleware = new WebRequestCapture;
         $request = Request::create('/test', 'GET');
 
-        $response = $middleware->handle($request, fn($req): Response => new Response('Web Response'));
+        $response = $middleware->handle($request, fn ($req): Response => new Response('Web Response'));
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Web Response', $response->getContent());
