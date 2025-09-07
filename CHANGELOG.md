@@ -2,6 +2,27 @@
 
 All notable changes to `laravel-request-analytics` will be documented in this file.
 
+## v1.0.0 - 2025-09-07
+
+### What's Changed
+
+* Make dynamic dashboard and make configurable request data processing by @theihasan in https://github.com/me-shaon/laravel-request-analytics/pull/25
+* Scheduled task for pruning old data by @theihasan in https://github.com/me-shaon/laravel-request-analytics/pull/26
+* Refactor middleware registration in service provider by @theihasan in https://github.com/me-shaon/laravel-request-analytics/pull/27
+* Bump dependabot/fetch-metadata from 2.3.0 to 2.4.0 by @dependabot[bot] in https://github.com/me-shaon/laravel-request-analytics/pull/29
+* Bump aglipanci/laravel-pint-action from 2.5 to 2.6 by @dependabot[bot] in https://github.com/me-shaon/laravel-request-analytics/pull/31
+* Bump stefanzweifel/git-auto-commit-action from 5 to 6 by @dependabot[bot] in https://github.com/me-shaon/laravel-request-analytics/pull/30
+* Document and secure analytics dashboard access by @theihasan in https://github.com/me-shaon/laravel-request-analytics/pull/28
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/me-shaon/laravel-request-analytics/pull/32
+* Added support for laravel 12 by @theihasan in https://github.com/me-shaon/laravel-request-analytics/pull/36
+* Feature/package improvements by @me-shaon in https://github.com/me-shaon/laravel-request-analytics/pull/33
+
+### New Contributors
+
+* @me-shaon made their first contribution in https://github.com/me-shaon/laravel-request-analytics/pull/33
+
+**Full Changelog**: https://github.com/me-shaon/laravel-request-analytics/compare/v0.1.0...v1.0.0
+
 ## v0.1.0 - 2025-03-04
 
 ### What's Changed
