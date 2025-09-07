@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-request-analytics` will be documented in this file.
 
+## v1.1.0 - 2025-09-07
+
+- Add: web and api category filter in analytics dashboard
+- Fix: chart value for visitor and views
+- Add: default ignore paths
+- Fix: ignore path check for exact path and wild-card path
+
+**Full Changelog**: https://github.com/me-shaon/laravel-request-analytics/compare/v1.0.0...v1.1.0
+
 ## v1.0.0 - 2025-09-07
 
 ### What's Changed
