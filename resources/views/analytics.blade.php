@@ -46,7 +46,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Traffic Overview</h2>
                 <p class="text-sm text-gray-500">Daily visitor and page view trends</p>
             </div>
-            <x-request-analytics::stats.chart :labels='$labels' :datasets='$datasets'/>
+            <x-request-analytics::stats.chart :labels='$labels' :datasets='$datasets' type="line"/>
         </div>
 
         <!-- Analytics Grid -->

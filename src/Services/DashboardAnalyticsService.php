@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MeShaon\RequestAnalytics\Services;
 
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\CarbonInterval;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -74,16 +74,30 @@ class DashboardAnalyticsService
         $chartData['datasets'] = collect($chartData['datasets'])->map(function (array $dataset): array {
             if ($dataset['label'] === 'Views') {
                 return array_merge($dataset, [
-                    'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.1)',
                     'borderColor' => 'rgba(255, 99, 132, 1)',
-                    'borderWidth' => 1,
+                    'borderWidth' => 3,
+                    'fill' => false,
+                    'tension' => 0.2,
+                    'pointBackgroundColor' => 'rgba(255, 99, 132, 1)',
+                    'pointBorderColor' => '#fff',
+                    'pointBorderWidth' => 2,
+                    'pointRadius' => 5,
+                    'pointHoverRadius' => 7,
                 ]);
             }
             if ($dataset['label'] === 'Visitors') {
                 return array_merge($dataset, [
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.1)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'borderWidth' => 1,
+                    'borderWidth' => 3,
+                    'fill' => false,
+                    'tension' => 0.2,
+                    'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                    'pointBorderColor' => '#fff',
+                    'pointBorderWidth' => 2,
+                    'pointRadius' => 5,
+                    'pointHoverRadius' => 7,
                 ]);
             }
 
@@ -100,7 +114,7 @@ class DashboardAnalyticsService
         $baseQuery = $this->getBaseQuery($dateRange);
 
         $totalViews = $baseQuery->count();
-        $uniqueVisitors = $baseQuery->distinct('session_id')->count('session_id');
+        $uniqueVisitors = $baseQuery->distinct('visitor_id')->count('visitor_id');
 
         // Calculate bounce rate (percentage of sessions with only one page view)
         $tableName = config('request-analytics.database.table', 'request_analytics');
