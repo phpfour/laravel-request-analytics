@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-request-analytics` will be documented in this file.
 
+## v1.1.1 - 2025-09-07
+
+- Fix: Chart view
+
+**Full Changelog**: https://github.com/me-shaon/laravel-request-analytics/compare/v1.1.0...v1.1.1
+
 ## v1.1.0 - 2025-09-07
 
 - Add: web and api category filter in analytics dashboard
