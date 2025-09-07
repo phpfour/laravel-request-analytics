@@ -19,7 +19,7 @@ class PageViewsRequest extends FormRequest
             'date_range' => 'integer|min:1|max:365',
             'path' => 'string',
             'page' => 'integer|min:1',
-            'per_page' => 'integer|min:10|max:100',
+            'per_page' => 'integer|min:1|max:100',
         ];
     }
 }

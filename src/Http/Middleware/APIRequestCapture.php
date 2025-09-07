@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MeShaon\RequestAnalytics\Http\Middleware;
 
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 use MeShaon\RequestAnalytics\Http\Jobs\ProcessData;
 use MeShaon\RequestAnalytics\Traits\CaptureRequest;
+use Symfony\Component\HttpFoundation\Response;
 
 class APIRequestCapture
 {
@@ -29,7 +32,7 @@ class APIRequestCapture
                     ProcessData::dispatchSync($requestData);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error($e->getMessage());
         }
     }

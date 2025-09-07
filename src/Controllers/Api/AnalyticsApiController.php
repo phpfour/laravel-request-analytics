@@ -32,7 +32,7 @@ class AnalyticsApiController extends BaseController
     public function visitors(VisitorsRequest $request): JsonResponse
     {
         $params = $request->validated();
-        $perPage = $request->input('per_page', 50);
+        $perPage = (int) $request->input('per_page', 50);
 
         $visitors = $this->analyticsService->getVisitors($params, $perPage);
 
@@ -44,7 +44,7 @@ class AnalyticsApiController extends BaseController
     public function pageViews(PageViewsRequest $request): JsonResponse
     {
         $params = $request->validated();
-        $perPage = $request->input('per_page', 50);
+        $perPage = (int) $request->input('per_page', 50);
 
         $pageViews = $this->analyticsService->getPageViews($params, $perPage);
 

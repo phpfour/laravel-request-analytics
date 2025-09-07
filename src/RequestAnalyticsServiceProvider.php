@@ -54,13 +54,11 @@ class RequestAnalyticsServiceProvider extends PackageServiceProvider
     private function pushMiddlewareToPipeline(): void
     {
         if (config('request-analytics.capture.web')) {
-            $this->app[Kernel::class]->appendMiddlewareToGroup('web',
-                WebRequestCapture::class);
+            $this->app[Kernel::class]->appendMiddlewareToGroup('web', WebRequestCapture::class);
         }
 
         if (config('request-analytics.capture.api')) {
-            $this->app[Kernel::class]->appendMiddlewareToGroup('api',
-                APIRequestCapture::class);
+            $this->app[Kernel::class]->appendMiddlewareToGroup('api', APIRequestCapture::class);
         }
     }
 }

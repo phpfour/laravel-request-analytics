@@ -17,6 +17,19 @@ return [
         'bots' => false, // Set to true to capture bot traffic
     ],
 
+    'middleware' => [
+        'web' => [
+            'web',
+            // 'auth', // Uncomment if using web authentication
+            'request-analytics.access',
+        ],
+        'api' => [
+            'api',
+            // 'auth:sanctum', // Uncomment if using Sanctum authentication
+            'request-analytics.access',
+        ],
+    ],
+
     'queue' => [
         'enabled' => env('REQUEST_ANALYTICS_QUEUE_ENABLED', false),
     ],

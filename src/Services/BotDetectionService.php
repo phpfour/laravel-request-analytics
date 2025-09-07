@@ -87,6 +87,12 @@ class BotDetectionService
         }
 
         [$subnet, $bits] = explode('/', $range);
+
+        // Skip IPv6 addresses for now (ip2long only works for IPv4)
+        if (str_contains($ip, ':') || str_contains($subnet, ':')) {
+            return false;
+        }
+
         $ipLong = ip2long($ip);
         $subnetLong = ip2long($subnet);
 

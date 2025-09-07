@@ -3,11 +3,11 @@
 namespace MeShaon\RequestAnalytics\Traits;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use MeShaon\RequestAnalytics\Http\DTO\RequestDataDTO;
 use MeShaon\RequestAnalytics\Services\BotDetectionService;
 use MeShaon\RequestAnalytics\Services\GeolocationService;
 use MeShaon\RequestAnalytics\Services\VisitorTrackingService;
+use Symfony\Component\HttpFoundation\Response;
 
 trait CaptureRequest
 {
@@ -53,7 +53,7 @@ trait CaptureRequest
         $language = $request->header('Accept-Language', '');
         $queryParams = json_encode($request->query());
         $httpMethod = $request->method();
-        $responseTime = microtime(true) - LARAVEL_START;
+        $responseTime = defined('LARAVEL_START') ? microtime(true) - LARAVEL_START : 0;
 
         // Get visitor and session IDs
         $visitorTracking = new VisitorTrackingService;
@@ -141,12 +141,12 @@ trait CaptureRequest
             '/win16/i' => 'Windows 3.11',
             '/macintosh|mac os x/i' => 'Mac OS X',
             '/mac_powerpc/i' => 'Mac OS 9',
-            '/linux/i' => 'Linux',
-            '/ubuntu/i' => 'Ubuntu',
             '/iphone/i' => 'iOS',
             '/ipod/i' => 'iOS',
             '/ipad/i' => 'iOS',
-            '/android/i' => 'Android',
+            '/android/i' => 'Android',  // Check Android before generic Linux
+            '/ubuntu/i' => 'Ubuntu',  // Check Ubuntu before generic Linux
+            '/linux/i' => 'Linux',
             '/blackberry/i' => 'BlackBerry',
             '/webos/i' => 'Mobile',
         ];
@@ -166,13 +166,13 @@ trait CaptureRequest
         $browser = 'Unknown';
         $browserRegexes = [
             '/msie|trident/i' => 'Internet Explorer',
+            '/edg/i' => 'Edge',  // Edge before Chrome since Edge contains Chrome
             '/edge/i' => 'Edge',
-            '/edg/i' => 'Edge',
+            '/opr|opera/i' => 'Opera',  // Opera before Chrome since Opera contains Chrome
             '/firefox/i' => 'Firefox',
             '/brave/i' => 'Brave',
             '/chrome/i' => 'Chrome',
             '/safari/i' => 'Safari',
-            '/opera|opr/i' => 'Opera',
         ];
 
         foreach ($browserRegexes as $regex => $br) {
@@ -189,9 +189,9 @@ trait CaptureRequest
     {
         $device = 'Unknown';
         $deviceRegexes = [
+            '/ipad/i' => 'iPad',  // iPad before iPhone since iPad might contain iPhone
+            '/ipod/i' => 'iPod',  // iPod before iPhone
             '/iphone/i' => 'iPhone',
-            '/ipod/i' => 'iPod',
-            '/ipad/i' => 'iPad',
             '/android/i' => 'Android',
             '/blackberry/i' => 'BlackBerry',
             '/windows phone/i' => 'Windows Phone',

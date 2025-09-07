@@ -48,7 +48,7 @@ class AnalyticsService
             'total_views' => $totalViews,
             'unique_visitors' => $uniqueVisitors,
             'unique_sessions' => $uniqueSessions,
-            'avg_response_time' => round($avgResponseTime, 2),
+            'avg_response_time' => round($avgResponseTime ?: 0, 2),
         ];
     }
 
@@ -311,7 +311,7 @@ class AnalyticsService
     {
         $dateRange = $this->getDateRange($params);
         $query = $this->getBaseQuery($dateRange);
-        $withPercentages = $params['with_percentages'] ?? false;
+        $withPercentages = (bool) $params['with_percentages'] ?? false;
 
         return [
             'summary' => $this->getSummary($query),

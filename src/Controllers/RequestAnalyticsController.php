@@ -14,7 +14,10 @@ class RequestAnalyticsController extends BaseController
 
     public function show(Request $request)
     {
-        $dateRange = $request->input('date_range', 30);
+        $dateRangeInput = $request->input('date_range', 30);
+        $dateRange = is_numeric($dateRangeInput) && (int) $dateRangeInput > 0
+            ? (int) $dateRangeInput
+            : 30;
         $this->dashboardService->setDateRange($dateRange);
 
         $data = $this->dashboardService->getDashboardData();
