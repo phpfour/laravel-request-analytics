@@ -13,17 +13,18 @@ class AnalyticsDashboardMiddleware
     public function handle(Request $request, Closure $next)
     {
         $user = $request->user();
+        if ($user) {
+            if (! $user instanceof CanAccessAnalyticsDashboard) {
+                return $request->expectsJson()
+                    ? response()->json(['message' => 'Unauthorized'], 403)
+                    : abort(403);
+            }
 
-        if (! $user || ! ($user instanceof CanAccessAnalyticsDashboard)) {
-            return $request->expectsJson()
-                ? response()->json(['message' => 'Unauthorized'], 403)
-                : abort(403);
-        }
-
-        if (! $user->canAccessAnalyticsDashboard()) {
-            return $request->expectsJson()
-                ? response()->json(['message' => 'Access denied'], 403)
-                : abort(403);
+            if (! $user->canAccessAnalyticsDashboard()) {
+                return $request->expectsJson()
+                    ? response()->json(['message' => 'Access denied'], 403)
+                    : abort(403);
+            }
         }
 
         return $next($request);

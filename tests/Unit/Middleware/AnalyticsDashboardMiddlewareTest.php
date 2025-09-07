@@ -24,33 +24,6 @@ class AnalyticsDashboardMiddlewareTest extends TestCase
     }
 
     #[Test]
-    public function it_returns_json_403_when_no_user_and_expects_json(): void
-    {
-        $request = Request::create('/api/analytics');
-        $request->headers->set('Accept', 'application/json');
-
-        $next = fn ($req): Response => new Response('Should not reach here');
-
-        $response = $this->middleware->handle($request, $next);
-
-        $this->assertEquals(403, $response->getStatusCode());
-        $responseData = json_decode((string) $response->getContent(), true);
-        $this->assertEquals('Unauthorized', $responseData['message']);
-    }
-
-    #[Test]
-    public function it_aborts_403_when_no_user_and_expects_html(): void
-    {
-        $request = Request::create('/analytics');
-
-        $next = fn ($req): Response => new Response('Should not reach here');
-
-        $this->expectException(HttpException::class);
-
-        $this->middleware->handle($request, $next);
-    }
-
-    #[Test]
     public function it_returns_json_403_when_user_does_not_implement_interface_and_expects_json(): void
     {
         $user = Mockery::mock();
