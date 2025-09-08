@@ -46,7 +46,7 @@ class AnalyticsService
     public function getSummary($query): array
     {
         $totalViews = (clone $query)->count();
-        $uniqueVisitors = (clone $query)->distinct('visitor_id')->count('visitor_id');
+        $uniqueVisitors = $this->getUniqueVisitorCount($query);
         $uniqueSessions = (clone $query)->distinct('session_id')->count('session_id');
         $avgResponseTime = (clone $query)->avg('response_time');
 
@@ -61,11 +61,7 @@ class AnalyticsService
     public function getChartData($query, array $dateRange): array
     {
         $dateExpression = $this->getDateExpression('visited_at');
-
-        // Check if we should use session_id instead of visitor_id for counting
-        $totalRecords = (clone $query)->count();
-        $validVisitorIds = (clone $query)->whereNotNull('visitor_id')->where('visitor_id', '!=', '')->count();
-        $useSessionId = $totalRecords > 0 && ($validVisitorIds / $totalRecords) < 0.5;
+        $useSessionId = $this->shouldUseSessionId($query);
 
         $visitorCountExpression = $useSessionId
             ? 'COUNT(DISTINCT session_id) as visitors'
@@ -294,6 +290,7 @@ class AnalyticsService
     public function getOperatingSystems($query, bool $withPercentages = false): array
     {
         $totalVisitors = (clone $query)->distinct('session_id')->count('session_id');
+
         if ($totalVisitors === 0) {
             return [];
         }
@@ -388,6 +385,27 @@ class AnalyticsService
             'sqlite' => "DATE({$column})",
             default => "DATE({$column})"
         };
+    }
+
+    protected function shouldUseSessionId($query): bool
+    {
+        $totalRecords = (clone $query)->count();
+        if ($totalRecords === 0) {
+            return false;
+        }
+
+        $validVisitorIds = (clone $query)->whereNotNull('visitor_id')->where('visitor_id', '!=', '')->count();
+
+        return ($validVisitorIds / $totalRecords) < 0.5;
+    }
+
+    public function getUniqueVisitorCount($query): int
+    {
+        if ($this->shouldUseSessionId($query)) {
+            return (clone $query)->distinct('session_id')->count('session_id');
+        }
+
+        return (clone $query)->distinct('visitor_id')->count('visitor_id');
     }
 
     public function getDomainExpression(string $column): string

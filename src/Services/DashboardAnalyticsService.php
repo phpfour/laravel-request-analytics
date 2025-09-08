@@ -116,17 +116,7 @@ class DashboardAnalyticsService
         $baseQuery = $this->getBaseQuery($dateRange);
 
         $totalViews = (clone $baseQuery)->count();
-
-        // Try to count unique visitors by visitor_id, fallback to session_id if visitor_id is mostly null/empty
-        $visitorIdCount = (clone $baseQuery)->whereNotNull('visitor_id')->where('visitor_id', '!=', '')->distinct('visitor_id')->count('visitor_id');
-        $totalRecords = (clone $baseQuery)->count();
-
-        // If less than 50% of records have valid visitor_id, use session_id instead
-        if ($totalRecords > 0 && ($visitorIdCount / $totalRecords) < 0.5) {
-            $uniqueVisitors = (clone $baseQuery)->distinct('session_id')->count('session_id');
-        } else {
-            $uniqueVisitors = (clone $baseQuery)->distinct('visitor_id')->count('visitor_id');
-        }
+        $uniqueVisitors = $this->analyticsService->getUniqueVisitorCount($baseQuery);
 
         // Calculate bounce rate (percentage of sessions with only one page view)
         $tableName = config('request-analytics.database.table', 'request_analytics');
