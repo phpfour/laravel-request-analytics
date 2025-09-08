@@ -44,21 +44,6 @@ class CaptureRequestTest extends TestCase
                 return $this->parseUserAgent($userAgent);
             }
 
-            public function testGetOperatingSystem($userAgent): string
-            {
-                return $this->getOperatingSystem($userAgent);
-            }
-
-            public function testGetBrowser($userAgent): string
-            {
-                return $this->getBrowser($userAgent);
-            }
-
-            public function testGetDevice($userAgent): string
-            {
-                return $this->getDevice($userAgent);
-            }
-
             public function testShouldIgnore(string $path): bool
             {
                 return $this->shouldIgnore($path);
@@ -210,76 +195,6 @@ class CaptureRequestTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('operatingSystemProvider')]
-    public function it_detects_operating_systems_correctly(string $userAgent, string $expected): void
-    {
-        $result = $this->traitClass->testGetOperatingSystem($userAgent);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public static function operatingSystemProvider(): array
-    {
-        return [
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Windows 10'],
-            ['Mozilla/5.0 (Windows NT 6.1; Win64; x64)', 'Windows 7'],
-            ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'Mac OS X'],
-            ['Mozilla/5.0 (X11; Linux x86_64)', 'Linux'],
-            ['Mozilla/5.0 (X11; Ubuntu; Linux x86_64)', 'Ubuntu'],
-            ['Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X)', 'Mac OS X'],
-            ['Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X)', 'Mac OS X'],
-            ['Mozilla/5.0 (Linux; Android 11)', 'Android'],
-            ['Unknown User Agent', 'Unknown'],
-        ];
-    }
-
-    #[Test]
-    #[DataProvider('browserProvider')]
-    public function it_detects_browsers_correctly(string $userAgent, string $expected): void
-    {
-        $result = $this->traitClass->testGetBrowser($userAgent);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public static function browserProvider(): array
-    {
-        return [
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', 'Chrome'],
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0', 'Firefox'],
-            ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15', 'Safari'],
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59', 'Edge'],
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 OPR/77.0.4054.277', 'Opera'],
-            ['Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)', 'Internet Explorer'],
-            ['Unknown User Agent', 'Unknown'],
-        ];
-    }
-
-    #[Test]
-    #[DataProvider('deviceProvider')]
-    public function it_detects_devices_correctly(string $userAgent, string $expected): void
-    {
-        $result = $this->traitClass->testGetDevice($userAgent);
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public static function deviceProvider(): array
-    {
-        return [
-            ['Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X)', 'iPhone'],
-            ['Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X)', 'iPad'],
-            ['Mozilla/5.0 (iPod touch; CPU iPhone OS 14_6 like Mac OS X)', 'iPod'],
-            ['Mozilla/5.0 (Linux; Android 11; SM-G991B)', 'Android'],
-            ['Mozilla/5.0 (Mobile; Windows Phone 8.1)', 'Windows Phone'],
-            ['Mozilla/5.0 (BlackBerry; U; BlackBerry 9900)', 'BlackBerry'],
-            ['Mozilla/5.0 (Mobile; rv:26.0) Gecko/26.0 Firefox/26.0', 'Mobile'],
-            ['Mozilla/5.0 (Tablet; rv:26.0) Gecko/26.0 Firefox/26.0', 'Tablet'],
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Unknown'],
-        ];
-    }
-
-    #[Test]
     public function it_parses_user_agent_correctly(): void
     {
         $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
@@ -287,9 +202,9 @@ class CaptureRequestTest extends TestCase
         $result = $this->traitClass->testParseUserAgent($userAgent);
 
         $this->assertIsArray($result);
-        $this->assertEquals('Windows 10', $result['operating_system']);
+        $this->assertEquals('Windows', $result['operating_system']);
         $this->assertEquals('Chrome', $result['browser']);
-        $this->assertEquals('Unknown', $result['device']);
+        $this->assertEquals('Other', $result['device']);
     }
 
     #[Test]

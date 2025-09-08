@@ -8,6 +8,7 @@ use MeShaon\RequestAnalytics\Services\BotDetectionService;
 use MeShaon\RequestAnalytics\Services\GeolocationService;
 use MeShaon\RequestAnalytics\Services\VisitorTrackingService;
 use Symfony\Component\HttpFoundation\Response;
+use UAParser\Parser;
 
 trait CaptureRequest
 {
@@ -115,98 +116,14 @@ trait CaptureRequest
 
     protected function parseUserAgent($userAgent): array
     {
-        $operating_system = $this->getOperatingSystem($userAgent);
-        $browser = $this->getBrowser($userAgent);
-        $device = $this->getDevice($userAgent);
+        $parser = Parser::create();
+        $result = $parser->parse($userAgent);
 
-        return ['operating_system' => $operating_system, 'browser' => $browser, 'device' => $device];
-    }
-
-    protected function getOperatingSystem($userAgent): string
-    {
-        $operatingSystem = 'Unknown';
-        $osRegexes = [
-            '/windows nt 10/i' => 'Windows 10',
-            '/windows nt 6\.3/i' => 'Windows 8.1',
-            '/windows nt 6\.2/i' => 'Windows 8',
-            '/windows nt 6\.1/i' => 'Windows 7',
-            '/windows nt 6\.0/i' => 'Windows Vista',
-            '/windows nt 5\.2/i' => 'Windows Server 2003/XP x64',
-            '/windows nt 5\.1/i' => 'Windows XP',
-            '/windows xp/i' => 'Windows XP',
-            '/windows nt 5\.0/i' => 'Windows 2000',
-            '/windows me/i' => 'Windows ME',
-            '/win98/i' => 'Windows 98',
-            '/win95/i' => 'Windows 95',
-            '/win16/i' => 'Windows 3.11',
-            '/macintosh|mac os x/i' => 'Mac OS X',
-            '/mac_powerpc/i' => 'Mac OS 9',
-            '/iphone/i' => 'iOS',
-            '/ipod/i' => 'iOS',
-            '/ipad/i' => 'iOS',
-            '/android/i' => 'Android',  // Check Android before generic Linux
-            '/ubuntu/i' => 'Ubuntu',  // Check Ubuntu before generic Linux
-            '/linux/i' => 'Linux',
-            '/blackberry/i' => 'BlackBerry',
-            '/webos/i' => 'Mobile',
+        return [
+            'operating_system' => $result->os->family,
+            'browser' => $result->ua->family,
+            'device' => $result->device->family,
         ];
-
-        foreach ($osRegexes as $regex => $os) {
-            if (preg_match($regex, (string) $userAgent)) {
-                $operatingSystem = $os;
-                break;
-            }
-        }
-
-        return $operatingSystem;
-    }
-
-    protected function getBrowser($userAgent): string
-    {
-        $browser = 'Unknown';
-        $browserRegexes = [
-            '/msie|trident/i' => 'Internet Explorer',
-            '/edg/i' => 'Edge',  // Edge before Chrome since Edge contains Chrome
-            '/edge/i' => 'Edge',
-            '/opr|opera/i' => 'Opera',  // Opera before Chrome since Opera contains Chrome
-            '/firefox/i' => 'Firefox',
-            '/brave/i' => 'Brave',
-            '/chrome/i' => 'Chrome',
-            '/safari/i' => 'Safari',
-        ];
-
-        foreach ($browserRegexes as $regex => $br) {
-            if (preg_match($regex, (string) $userAgent)) {
-                $browser = $br;
-                break;
-            }
-        }
-
-        return $browser;
-    }
-
-    protected function getDevice($userAgent): string
-    {
-        $device = 'Unknown';
-        $deviceRegexes = [
-            '/ipad/i' => 'iPad',  // iPad before iPhone since iPad might contain iPhone
-            '/ipod/i' => 'iPod',  // iPod before iPhone
-            '/iphone/i' => 'iPhone',
-            '/android/i' => 'Android',
-            '/blackberry/i' => 'BlackBerry',
-            '/windows phone/i' => 'Windows Phone',
-            '/mobile/i' => 'Mobile',
-            '/tablet/i' => 'Tablet',
-        ];
-
-        foreach ($deviceRegexes as $regex => $dev) {
-            if (preg_match($regex, (string) $userAgent)) {
-                $device = $dev;
-                break;
-            }
-        }
-
-        return $device;
     }
 
     protected function shouldIgnore(string $path): bool
