@@ -3,7 +3,7 @@
 ])
 
 
-<x-request-analytics::stats.list primaryLabel="Countries" secondaryLabel="Visitors">
+<x-request-analytics::stats.list primaryLabel="Countries" secondaryLabel="">
     @forelse($countries as $country)
         <x-request-analytics::stats.item
                 label="{{ $country['name'] }}"

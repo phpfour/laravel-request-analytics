@@ -6,17 +6,17 @@
     if (!function_exists('getBrowserImage')) {
         function getBrowserImage($browser): string {
             return match(strtolower($browser)){
-                'chrome' =>  asset('browsers/chrome.png'),
-                'firefox' => asset('browsers/firefox.png'),
-                'safari' => asset('browsers/safari.png'),
-                'edge' => asset('browsers/ms-edge.png'),
-                default => asset('browsers/unknown.png'),
+                'chrome' =>  asset('vendor/request-analytics/browsers/chrome.png'),
+                'firefox' => asset('vendor/request-analytics/browsers/firefox.png'),
+                'safari' => asset('vendor/request-analytics/browsers/safari.png'),
+                'edge' => asset('vendor/request-analytics/browsers/ms-edge.png'),
+                default => asset('vendor/request-analytics/browsers/unknown.png'),
             };
         }
     }
 @endphp
 
-<x-request-analytics::stats.list primaryLabel="Browser" secondaryLabel="Visitors">
+<x-request-analytics::stats.list primaryLabel="Browser" secondaryLabel="">
     @forelse($browsers as $browser)
         <x-request-analytics::stats.item
             label="{{ $browser['browser'] }}"

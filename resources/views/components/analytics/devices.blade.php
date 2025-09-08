@@ -6,16 +6,16 @@
     if (!function_exists('getDeviceImage')) {
         function getDeviceImage($device): string {
             return match(strtolower($device)){
-                'mobile' => asset('devices/smartphone.png'),
-                'tablet' => asset('devices/ipad.png'),
-                'desktop' => asset('devices/laptop.png'),
-                'tv' => asset('devices/tv.png'),
-                default => asset('devices/unknown.png'),
+                'mobile' => asset('vendor/request-analytics/devices/smartphone.png'),
+                'tablet' => asset('vendor/request-analytics/devices/ipad.png'),
+                'desktop' => asset('vendor/request-analytics/devices/laptop.png'),
+                'tv' => asset('vendor/request-analytics/devices/tv.png'),
+                default => asset('vendor/request-analytics/devices/unknown.png'),
             };
         }
     }
 @endphp
-<x-request-analytics::stats.list primaryLabel="Devices" secondaryLabel="Visitors">
+<x-request-analytics::stats.list primaryLabel="Devices" secondaryLabel="">
     @forelse($devices as $device)
         <x-request-analytics::stats.item
             label="{{ $device['name'] }}"
