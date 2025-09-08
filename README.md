@@ -117,14 +117,14 @@ return [
     ],
 ];
 ```
-### Optional Assets & Views
+### Assets & Views
 
-Publish dashboard assets (CSS, JS):
+Publish dashboard assets:
 ```bash
 php artisan vendor:publish --tag="request-analytics-assets"
 ```
 
-Publish views for customization:
+Optionally, publish the views for customization:
 ```bash
 php artisan vendor:publish --tag="request-analytics-views"
 ```
